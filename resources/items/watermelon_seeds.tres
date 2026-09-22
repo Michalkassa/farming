@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/item_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://static/items/watermelon_seeds.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"watermelon_seeds"
+display_name = "Watermelon Seeds"
+icon = ExtResource("2_icon")
+buy_price = 275
+sell_price = 95
+max_stack = 99
+for_sale = true
+seed_for = &"watermelon"
+grow_time = 130.0
+harvest_amount = 3

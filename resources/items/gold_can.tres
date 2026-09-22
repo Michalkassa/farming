@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/item_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://static/items/gold_can.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"gold_can"
+display_name = "Gold Can"
+icon = ExtResource("2_icon")
+buy_price = 6000
+sell_price = 0
+max_stack = 1
+for_sale = true
+tool_kind = &"watering_can"
+tool_area = 4

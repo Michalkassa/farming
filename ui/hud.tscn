@@ -1,0 +1,356 @@
+[gd_scene load_steps=15 format=3 uid="uid://bhudclover0001"]
+
+[ext_resource type="Script" path="res://ui/hud.gd" id="1_7ihmi"]
+[ext_resource type="Texture2D" path="res://static/ui/barn.png" id="3_1v5rv"]
+[ext_resource type="PackedScene" path="res://ui/inventory_slot.tscn" id="5_slot"]
+[ext_resource type="PackedScene" path="res://ui/shop_row.tscn" id="6_row"]
+
+[sub_resource type="ButtonGroup" id="ShopTabGroup"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_so1yu"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mp5xd"]
+
+[node name="HUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_7ihmi")
+inventory_slot_scene = ExtResource("5_slot")
+shop_row_scene = ExtResource("6_row")
+
+[node name="BottomBar" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+texture_filter = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_bottom = -14.0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="BarnButton" type="Button" parent="BottomBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+
+[node name="BarnIcon" type="TextureRect" parent="BottomBar/BarnButton"]
+texture_filter = 1
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+mouse_filter = 2
+texture = ExtResource("3_1v5rv")
+stretch_mode = 5
+
+[node name="MoneyBadge" type="PanelContainer" parent="BottomBar"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"Badge"
+
+[node name="M" type="MarginContainer" parent="BottomBar/MoneyBadge"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="H" type="HBoxContainer" parent="BottomBar/MoneyBadge/M"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HudMoneyLabel" type="Label" parent="BottomBar/MoneyBadge/M/H"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(1, 0.8, 0.25, 1)
+text = "€0"
+
+[node name="HotbarRow" type="HBoxContainer" parent="BottomBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 6
+
+[node name="CursorView" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+texture_filter = 1
+z_index = 100
+layout_mode = 3
+mouse_filter = 2
+
+[node name="CursorIcon" type="TextureRect" parent="CursorView"]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 0
+offset_left = -46.0
+offset_top = -46.0
+offset_right = 46.0
+offset_bottom = 46.0
+mouse_filter = 2
+stretch_mode = 5
+
+[node name="CursorCount" type="Label" parent="CursorView"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -46.0
+offset_top = -46.0
+offset_right = 46.0
+offset_bottom = 46.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.97, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="InventoryScreen" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+texture_filter = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Dim" type="ColorRect" parent="InventoryScreen"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.6)
+
+[node name="Center" type="CenterContainer" parent="InventoryScreen"]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Window" type="PanelContainer" parent="InventoryScreen/Center"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"WindowPanel"
+
+[node name="WindowMargin" type="MarginContainer" parent="InventoryScreen/Center/Window"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Outer" type="VBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TopBar" type="HBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="InvMoneyLabel" type="Label" parent="InventoryScreen/Center/Window/WindowMargin/Outer/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(1, 0.8, 0.25, 1)
+text = "€0"
+vertical_alignment = 1
+
+[node name="ResetButton" type="Button" parent="InventoryScreen/Center/Window/WindowMargin/Outer/TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_type_variation = &"DangerButton"
+focus_mode = 0
+theme_override_font_sizes/font_size = 16
+text = "New Game"
+
+[node name="CloseButton" type="Button" parent="InventoryScreen/Center/Window/WindowMargin/Outer/TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+text = "X"
+
+[node name="Body" type="HBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ShopPanel" type="PanelContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_so1yu")
+
+[node name="M" type="MarginContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="V" type="VBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ShopSign" type="CenterContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V"]
+layout_mode = 2
+
+[node name="Plaque" type="PanelContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V/ShopSign"]
+layout_mode = 2
+theme_type_variation = &"SignPlaque"
+
+[node name="M" type="MarginContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V/ShopSign/Plaque"]
+layout_mode = 2
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 26
+theme_override_constants/margin_bottom = 6
+
+[node name="Text" type="Label" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V/ShopSign/Plaque/M"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_constants/outline_size = 4
+text = "Shop"
+horizontal_alignment = 1
+
+[node name="ShopTabs" type="HBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="Seeds" type="Button" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V/ShopTabs"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ShopTabGroup")
+theme_override_font_sizes/font_size = 16
+text = "Seeds"
+
+[node name="Animals" type="Button" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V/ShopTabs"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("ShopTabGroup")
+theme_override_font_sizes/font_size = 16
+text = "Animals"
+
+[node name="Tools" type="Button" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V/ShopTabs"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("ShopTabGroup")
+theme_override_font_sizes/font_size = 16
+text = "Tools"
+
+[node name="BuyScroll" type="ScrollContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+scroll_deadzone = 8
+
+[node name="ShopList" type="VBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/ShopPanel/M/V/BuyScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="SellPanel" type="PanelContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_so1yu")
+
+[node name="M" type="MarginContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/SellPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="V" type="VBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/SellPanel/M"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SellLabel" type="Label" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/SellPanel/M/V"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.8, 0.72, 0.6, 1)
+text = "Sell"
+horizontal_alignment = 1
+
+[node name="SellCenter" type="CenterContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/SellPanel/M/V"]
+layout_mode = 2
+
+[node name="SellGrid" type="GridContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/SellPanel/M/V/SellCenter"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 1
+
+[node name="SellButtonCenter" type="CenterContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/SellPanel/M/V"]
+layout_mode = 2
+
+[node name="SellButton" type="Button" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/SellPanel/M/V/SellButtonCenter"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 52)
+layout_mode = 2
+theme_type_variation = &"GoldButton"
+focus_mode = 0
+disabled = true
+theme_override_font_sizes/font_size = 16
+text = "Sell"
+
+[node name="BackpackPanel" type="PanelContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxEmpty_mp5xd")
+
+[node name="M" type="MarginContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/BackpackPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="V" type="VBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/BackpackPanel/M"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HandLabel" type="Label" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/BackpackPanel/M/V"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.8, 0.72, 0.6, 1)
+text = "Hand"
+horizontal_alignment = 1
+
+[node name="HandCenter" type="CenterContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/BackpackPanel/M/V"]
+layout_mode = 2
+
+[node name="HandRow" type="HBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/BackpackPanel/M/V/HandCenter"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BackpackCenter" type="CenterContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/BackpackPanel/M/V"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="InvGrid" type="GridContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer/Body/BackpackPanel/M/V/BackpackCenter"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 5

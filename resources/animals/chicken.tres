@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AnimalKind" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/animal_kind.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://static/animals/chicken_0.png" id="idle_0"]
+[ext_resource type="Texture2D" path="res://static/animals/chicken_1.png" id="idle_1"]
+
+[resource]
+script = ExtResource("1_script")
+kind = &"chicken"
+idle_textures = Array[Texture2D]([ExtResource("idle_0"), ExtResource("idle_1")])
+walk_textures = Array[Texture2D]([])
+idle_fps = 3.0
+walk_fps = 7.0
+walk_speed = 9.0
+pause_seconds = Vector2(1.5, 5)
+step_length = Vector2(10, 30)
+target_candidates = 6
+elbow_room = 20.0
+spawn_spot = Vector2(212, 84)
+roam = Rect2(184, 68, 64, 26)

@@ -1,0 +1,27 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/game_state.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/item_grant.gd" id="2_item_grant"]
+
+[sub_resource type="Resource" id="Grant_0"]
+script = ExtResource("2_item_grant")
+item_id = &"hoe"
+count = 1
+container = "hotbar"
+
+[sub_resource type="Resource" id="Grant_1"]
+script = ExtResource("2_item_grant")
+item_id = &"watering_can"
+count = 1
+container = "hotbar"
+
+[sub_resource type="Resource" id="Grant_2"]
+script = ExtResource("2_item_grant")
+item_id = &"wheat_seeds"
+count = 30
+container = "hotbar"
+
+[node name="GameState" type="Node"]
+script = ExtResource("1_script")
+starting_money = 40
+starter_items = Array[ExtResource("2_item_grant")]([SubResource("Grant_0"), SubResource("Grant_1"), SubResource("Grant_2")])
