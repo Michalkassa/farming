@@ -285,9 +285,9 @@ stretch_mode = 1
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 126.0
-offset_top = 458.0
+offset_top = 426.0
 offset_right = 1026.0
-offset_bottom = 502.0
+offset_bottom = 470.0
 alignment = 1
 theme_override_constants/separation = 8
 
@@ -352,7 +352,7 @@ text = "Sell produce €0"
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 126.0
-offset_top = 506.0
+offset_top = 474.0
 offset_right = 1026.0
 offset_bottom = 648.0
 horizontal_scroll_mode = 1
@@ -361,6 +361,7 @@ scroll_deadzone = 8
 
 [node name="Goods" type="HBoxContainer" parent="Screen/Stage/GoodsScroll"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 166)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
