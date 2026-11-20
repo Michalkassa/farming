@@ -1,15 +1,37 @@
 [gd_scene format=3 uid="uid://bhudclover0001"]
 
 [ext_resource type="Script" path="res://ui/hud.gd" id="1_7ihmi"]
-[ext_resource type="Texture2D" path="res://static/ui/barn.png" id="3_1v5rv"]
 [ext_resource type="PackedScene" path="res://ui/inventory_slot.tscn" id="5_slot"]
+[ext_resource type="Texture2D" path="res://static/shop/barn_frame.png" id="7_barn_frame"]
+[ext_resource type="Texture2D" path="res://static/shop/hay_bale.png" id="9_hay"]
+[ext_resource type="Texture2D" path="res://static/shop/crate_slot.png" id="10_crate"]
+[ext_resource type="Texture2D" path="res://static/shop/barn_wall.png" id="11_wall"]
+[ext_resource type="Texture2D" path="res://static/shop/straw_floor.png" id="12_floor"]
+[ext_resource type="Texture2D" path="res://static/shop/beam.png" id="13_beam"]
+[ext_resource type="Texture2D" path="res://static/shop/lantern.png" id="14_lantern"]
+[ext_resource type="Texture2D" path="res://static/shop/post.png" id="15_post"]
+[ext_resource type="Texture2D" path="res://static/ui/settings_cog.png" id="16_cog"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mp5xd"]
+
+[sub_resource type="StyleBoxTexture" id="BarnFrame"]
+content_margin_left = 26.0
+content_margin_top = 26.0
+content_margin_right = 26.0
+content_margin_bottom = 26.0
+texture = ExtResource("7_barn_frame")
+texture_margin_left = 18.0
+texture_margin_top = 18.0
+texture_margin_right = 18.0
+texture_margin_bottom = 18.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
 [node name="HUD" type="CanvasLayer"]
 layer = 10
 script = ExtResource("1_7ihmi")
 inventory_slot_scene = ExtResource("5_slot")
+barn_slot_texture = ExtResource("10_crate")
 
 [node name="BottomBar" type="HBoxContainer" parent="."]
 unique_name_in_owner = true
@@ -22,26 +44,6 @@ offset_bottom = -14.0
 grow_vertical = 0
 mouse_filter = 2
 theme_override_constants/separation = 10
-
-[node name="BarnButton" type="Button" parent="BottomBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(96, 96)
-layout_mode = 2
-size_flags_vertical = 4
-focus_mode = 0
-
-[node name="BarnIcon" type="TextureRect" parent="BottomBar/BarnButton"]
-texture_filter = 1
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = -16.0
-offset_bottom = -16.0
-mouse_filter = 2
-texture = ExtResource("3_1v5rv")
-stretch_mode = 5
 
 [node name="MoneyBadge" type="PanelContainer" parent="BottomBar"]
 layout_mode = 2
@@ -115,11 +117,191 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Dim" type="ColorRect" parent="InventoryScreen"]
-layout_mode = 0
+[node name="Backdrop" type="ColorRect" parent="InventoryScreen"]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0, 0, 0, 0.6)
+color = Color(0.35, 0.15, 0.12, 1)
+
+[node name="Stage" type="Control" parent="InventoryScreen/Backdrop"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+
+[node name="Wall" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 231.0
+offset_bottom = 130.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("11_wall")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Floor" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 0.0
+offset_top = 540.0
+offset_right = 231.0
+offset_bottom = 562.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("12_floor")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="PostLeft" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 60.0
+offset_top = 0.0
+offset_right = 68.0
+offset_bottom = 112.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("15_post")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="PostRight" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 1052.0
+offset_top = 0.0
+offset_right = 1060.0
+offset_bottom = 112.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("15_post")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Beam" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 0.0
+offset_top = 70.0
+offset_right = 231.0
+offset_bottom = 80.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("13_beam")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Hay1" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 20.0
+offset_top = 470.0
+offset_right = 44.0
+offset_bottom = 486.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("9_hay")
+expand_mode = 1
+
+
+[node name="Hay2" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 135.0
+offset_top = 470.0
+offset_right = 159.0
+offset_bottom = 486.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("9_hay")
+expand_mode = 1
+
+flip_h = true
+
+[node name="Hay3" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 78.0
+offset_top = 395.0
+offset_right = 102.0
+offset_bottom = 411.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("9_hay")
+expand_mode = 1
+
+
+[node name="Hay4" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 905.0
+offset_top = 470.0
+offset_right = 929.0
+offset_bottom = 486.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("9_hay")
+expand_mode = 1
+
+flip_h = true
+
+[node name="Hay5" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 1015.0
+offset_top = 470.0
+offset_right = 1039.0
+offset_bottom = 486.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("9_hay")
+expand_mode = 1
+
+
+[node name="Hay6" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 960.0
+offset_top = 395.0
+offset_right = 984.0
+offset_bottom = 411.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("9_hay")
+expand_mode = 1
+
+flip_h = true
+
+[node name="LanternLeft" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 200.0
+offset_top = 118.0
+offset_right = 212.0
+offset_bottom = 138.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("14_lantern")
+expand_mode = 1
+
+
+[node name="LanternRight" type="TextureRect" parent="InventoryScreen/Backdrop/Stage"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 940.0
+offset_top = 118.0
+offset_right = 952.0
+offset_bottom = 138.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("14_lantern")
+expand_mode = 1
+
 
 [node name="Center" type="CenterContainer" parent="InventoryScreen"]
 unique_name_in_owner = true
@@ -130,7 +312,7 @@ anchor_bottom = 1.0
 [node name="Window" type="PanelContainer" parent="InventoryScreen/Center"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"WindowPanel"
+theme_override_styles/panel = SubResource("BarnFrame")
 
 [node name="WindowMargin" type="MarginContainer" parent="InventoryScreen/Center/Window"]
 layout_mode = 2
@@ -142,43 +324,6 @@ theme_override_constants/margin_bottom = 18
 [node name="Outer" type="VBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin"]
 layout_mode = 2
 theme_override_constants/separation = 12
-
-[node name="TopBar" type="HBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="BarnTitle" type="Label" parent="InventoryScreen/Center/Window/WindowMargin/Outer/TopBar"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Barn"
-vertical_alignment = 1
-
-[node name="InvMoneyLabel" type="Label" parent="InventoryScreen/Center/Window/WindowMargin/Outer/TopBar"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 32
-theme_override_colors/font_color = Color(1, 0.8, 0.25, 1)
-text = "€0"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ResetButton" type="Button" parent="InventoryScreen/Center/Window/WindowMargin/Outer/TopBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-theme_type_variation = &"DangerButton"
-focus_mode = 0
-theme_override_font_sizes/font_size = 16
-text = "New Game"
-
-[node name="CloseButton" type="Button" parent="InventoryScreen/Center/Window/WindowMargin/Outer/TopBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-focus_mode = 0
-theme_override_font_sizes/font_size = 24
-text = "X"
 
 [node name="Body" type="HBoxContainer" parent="InventoryScreen/Center/Window/WindowMargin/Outer"]
 layout_mode = 2
@@ -226,3 +371,158 @@ layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 5
+
+[node name="Decor" type="Control" parent="InventoryScreen/Center/Window"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="SignCenter" type="CenterContainer" parent="InventoryScreen/Center/Window/Decor"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = -40.0
+offset_bottom = 8.0
+mouse_filter = 2
+
+[node name="Plaque" type="PanelContainer" parent="InventoryScreen/Center/Window/Decor/SignCenter"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"SignPlaque"
+
+[node name="M" type="MarginContainer" parent="InventoryScreen/Center/Window/Decor/SignCenter/Plaque"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 4
+
+[node name="Text" type="Label" parent="InventoryScreen/Center/Window/Decor/SignCenter/Plaque/M"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 27
+text = "BARN"
+horizontal_alignment = 1
+
+[node name="CloseButton" type="Button" parent="InventoryScreen"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 14.0
+offset_right = 150.0
+offset_bottom = 62.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "< Farm"
+
+[node name="MoneyCorner" type="HBoxContainer" parent="InventoryScreen"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -216.0
+offset_top = 14.0
+offset_right = -16.0
+offset_bottom = 62.0
+grow_horizontal = 0
+mouse_filter = 2
+alignment = 2
+
+[node name="MoneyBadge" type="PanelContainer" parent="InventoryScreen/MoneyCorner"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="M" type="MarginContainer" parent="InventoryScreen/MoneyCorner/MoneyBadge"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 6
+
+[node name="InvMoneyLabel" type="Label" parent="InventoryScreen/MoneyCorner/MoneyBadge/M"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.25, 1)
+theme_override_font_sizes/font_size = 27
+text = "€0"
+
+[node name="SettingsButton" type="TextureButton" parent="."]
+unique_name_in_owner = true
+texture_filter = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -80.0
+offset_top = -80.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+tooltip_text = "Settings"
+focus_mode = 0
+texture_normal = ExtResource("16_cog")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="SettingsScreen" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+texture_filter = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Dim" type="ColorRect" parent="SettingsScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.6)
+
+[node name="Center" type="CenterContainer" parent="SettingsScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Panel" type="PanelContainer" parent="SettingsScreen/Center"]
+layout_mode = 2
+theme_type_variation = &"WindowPanel"
+
+[node name="M" type="MarginContainer" parent="SettingsScreen/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 26
+
+[node name="V" type="VBoxContainer" parent="SettingsScreen/Center/Panel/M"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="SettingsScreen/Center/Panel/M/V"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="ResetButton" type="Button" parent="SettingsScreen/Center/Panel/M/V"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+theme_type_variation = &"DangerButton"
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "New Game"
+
+[node name="SettingsClose" type="Button" parent="SettingsScreen/Center/Panel/M/V"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "Close"

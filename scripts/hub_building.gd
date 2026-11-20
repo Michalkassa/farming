@@ -78,6 +78,12 @@ func _animate(to_scale: Vector2, to_tint: Color) -> void:
 	var base := Vector2(-floorf(size.x / 2.0), -size.y)
 	_tween.tween_property(_sprite, "position", base * to_scale, hover_seconds)
 
+## A quick squash when something is delivered here (e.g. a harvest landing in the barn).
+func bump() -> void:
+	var resting := Vector2.ONE * (hover_scale if _hovered else 1.0)
+	_animate(resting * 1.1, hover_tint if _hovered else Color.WHITE)
+	_tween.chain().tween_callback(_animate.bind(resting, hover_tint if _hovered else Color.WHITE))
+
 ## Called when the player has gone inside, so the hover look doesn't stick.
 func reset_hover() -> void:
 	_set_hovered(false)

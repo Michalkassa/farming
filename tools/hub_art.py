@@ -286,6 +286,187 @@ def doghouse():
     return c
 
 
+BARN_RED, BARN_DK = (186, 58, 48), (140, 40, 36)
+BARN_ROOF, BARN_ROOF_DK = (110, 66, 52), (82, 46, 38)
+TRIM = (246, 240, 226)
+
+
+def barn(k=1.25):
+    """Red barn with a gambrel roof, hay loft and big X-braced doors, designed
+    on a 56x52 grid and drawn at k times that; bottom edge on the ground."""
+    w, h = int(round(56 * k)), int(round(52 * k))
+    c = Canvas(w, h)
+    d = Scaled(c, k)
+    a = lambda v: int(round(v * k))
+    # Walls with vertical boards.
+    d.rect(5, 22, 50, 50, BARN_RED)
+    for x in range(7, 50, 4):
+        d.rect(x, 22, x, 50, BARN_DK)
+    # Gambrel roof, drawn per output row: shallow top, steep sides.
+    for y in range(a(2), a(23)):
+        t = y / k
+        half = (12 + (t - 2) * 9 / 8) if t < 10 else (21 + (t - 10) * 6 / 12)
+        half = int(round(half * k))
+        band = int(t) % 4 == 0
+        c.rect(a(28) - half, y, a(28) + half - 1, y, BARN_ROOF_DK if band else BARN_ROOF)
+    d.rect(1, 22, 54, 22, BARN_ROOF_DK)
+    # Hay loft door with white trim and straw peeking out.
+    d.rect(23, 13, 32, 21, TRIM)
+    d.rect(24, 14, 31, 20, (60, 38, 22))
+    d.rect(24, 19, 31, 20, STRAW)
+    d.put(25, 18, STRAW_LT); d.put(29, 18, STRAW)
+    # Big double doors: white frame and X braces drawn in output pixels.
+    d.rect(16, 30, 39, 50, TRIM)
+    d.rect(17, 31, 27, 50, BARN_RED)
+    d.rect(28, 31, 38, 50, BARN_RED)
+    d.rect(27, 30, 28, 50, TRIM)
+    for x0, x1 in ((a(17), a(27)), (a(28), a(38))):
+        y0, y1 = a(31), a(51) - 1
+        n = y1 - y0
+        for i in range(n + 1):
+            xa = x0 + round(i * (x1 - x0 - 1) / n)
+            xb = x1 - 1 - round(i * (x1 - x0 - 1) / n)
+            c.put(xa, y0 + i, TRIM); c.put(xb, y0 + i, TRIM)
+    # Corner trim and a little window either side.
+    d.rect(5, 23, 6, 50, TRIM); d.rect(49, 23, 50, 50, TRIM)
+    for wx in (9, 42):
+        d.rect(wx, 28, wx + 4, 32, TRIM)
+        d.rect(wx + 1, 29, wx + 3, 31, (120, 190, 220))
+    c.outline()
+    return c
+
+
+# --- Barn storage window ------------------------------------------------------
+
+UI_U = 3                       # screen pixels per art pixel, like tools/ui_art.py
+
+
+def ui_save(c, name):
+    im = c.save(name)
+    im.resize((im.width * UI_U, im.height * UI_U), Image.NEAREST).save(OUT / name)
+
+
+def barn_frame():
+    """16x16 nine-slice (6-cell margins): red barn boards with white trim
+    around a dark plank interior. The centre tiles horizontally."""
+    c = Canvas(16, 16)
+    inside, seam = (74, 48, 30), (56, 36, 22)
+    c.rect(0, 0, 15, 15, inside)
+    for x in (6, 10, 14):
+        c.rect(x, 6, x, 9, seam)
+    for ring, col in ((0, OUTLINE), (1, TRIM), (2, BARN_RED), (3, BARN_RED), (4, BARN_DK), (5, OUTLINE)):
+        n = 15 - ring
+        c.rect(ring, ring, n, ring, col); c.rect(ring, n, n, n, col)
+        c.rect(ring, ring, ring, n, col); c.rect(n, ring, n, n, col)
+    # Board seams on the red border so it reads as planks.
+    for x in (7, 11):
+        c.put(x, 2, BARN_DK); c.put(x, 13, BARN_DK)
+    for y in (7, 11):
+        c.put(2, y, BARN_DK); c.put(13, y, BARN_DK)
+    # Keep the tiled middle columns identical so the edges repeat cleanly.
+    for x in range(6, 10):
+        for y in list(range(0, 6)) + list(range(10, 16)):
+            c.put(x, y, c.get(6, y) if x != 7 else c.get(7, y))
+    ui_save(c, "barn_frame.png")
+
+
+def crate_slot():
+    """12x12 nine-slice (4-cell margins): a little wooden crate cubby."""
+    c = Canvas(12, 12)
+    c.rect(0, 0, 11, 11, (46, 30, 18))
+    for ring, col in ((0, OUTLINE), (1, WOOD_LT), (2, WOOD), (3, WOOD_DK)):
+        n = 11 - ring
+        c.rect(ring, ring, n, ring, col); c.rect(ring, n, n, n, col)
+        c.rect(ring, ring, ring, n, col); c.rect(n, ring, n, n, col)
+    for x, y in ((1, 1), (10, 1), (1, 10), (10, 10)):
+        c.put(x, y, (170, 170, 176))             # nails
+    ui_save(c, "crate_slot.png")
+
+
+def barn_wall():
+    """16x16 interior barn boards (tile in both directions)."""
+    c = Canvas(16, 16)
+    base, seam, hi = (120, 52, 40), (88, 36, 30), (142, 66, 50)
+    c.rect(0, 0, 15, 15, base)
+    for x in (0, 8):
+        c.rect(x, 0, x, 15, seam)
+        c.rect(x + 1, 0, x + 1, 15, hi)
+    for x, y in ((4, 3), (12, 9), (5, 12), (13, 2)):
+        c.put(x, y, seam)
+    c.save("barn_wall.png")
+
+
+def straw_floor():
+    """16x16 straw-strewn floor boards (tile in both directions)."""
+    c = Canvas(16, 16)
+    c.rect(0, 0, 15, 15, (150, 104, 60))
+    c.rect(0, 7, 15, 7, (118, 80, 44)); c.rect(0, 15, 15, 15, (118, 80, 44))
+    for x, y, col in ((2, 2, STRAW), (3, 3, STRAW), (9, 1, STRAW_LT), (10, 2, STRAW), (13, 5, STRAW),
+                      (5, 10, STRAW_LT), (6, 11, STRAW), (11, 12, STRAW), (12, 13, STRAW_LT), (1, 13, STRAW)):
+        c.put(x, y, col)
+    c.save("straw_floor.png")
+
+
+def beam():
+    """16x10 roof beam (tiles horizontally)."""
+    c = Canvas(16, 10)
+    c.rect(0, 0, 15, 0, OUTLINE)
+    c.rect(0, 1, 15, 2, WOOD_LT)
+    c.rect(0, 3, 15, 7, WOOD)
+    c.put(5, 5, WOOD_DK); c.put(12, 4, WOOD_DK)
+    c.rect(0, 8, 15, 8, OUTLINE)
+    c.rect(0, 9, 15, 9, (60, 26, 22))
+    c.save("beam.png")
+
+
+def lantern():
+    """12x20 hanging lantern with a warm glow."""
+    c = Canvas(12, 20)
+    c.rect(5, 0, 6, 4, (70, 70, 76))             # chain
+    c.rect(3, 5, 8, 6, (60, 60, 66))             # cap
+    c.rect(2, 7, 9, 15, (255, 214, 120))         # glass
+    c.rect(4, 9, 7, 13, (255, 244, 200))         # flame glow
+    c.rect(2, 7, 2, 15, (60, 60, 66)); c.rect(9, 7, 9, 15, (60, 60, 66))
+    c.rect(2, 16, 9, 17, (60, 60, 66))
+    c.outline()
+    c.save("lantern.png")
+
+
+def settings_cog():
+    """16x16 wooden cogwheel for the settings button."""
+    import math
+    c = Canvas(16, 16)
+    cx = cy = 7.5
+    for y in range(16):
+        for x in range(16):
+            dx, dy = x - cx, y - cy
+            r = math.hypot(dx, dy)
+            ang = math.atan2(dy, dx)
+            tooth = math.cos(ang * 8) > 0.55          # eight teeth
+            if r <= 4.6 or (tooth and r <= 7.3):
+                c.put(x, y, WOOD_LT if dx + dy < -2 else (WOOD_DK if dx + dy > 3 else WOOD))
+            if r <= 1.6:
+                c.px.pop((x, y), None)                # axle hole
+    for x, y in ((6, 6), (9, 9)):
+        c.put(x, y, WOOD_DK)                          # grain
+    c.outline()
+    im = c.save("settings_cog.png")
+    (OUT / "settings_cog.png").replace(ROOT / "static/ui/settings_cog.png")
+
+
+def hay_bale():
+    """24x16 hay bale for the corners of the barn window."""
+    c = Canvas(24, 16)
+    c.rect(1, 3, 22, 14, STRAW)
+    c.rect(1, 3, 22, 4, STRAW_LT)
+    for x, y in ((3, 6), (9, 9), (15, 5), (19, 11), (6, 12), (12, 13)):
+        c.put(x, y, (198, 150, 62))
+    for x in (6, 17):
+        c.rect(x, 3, x, 14, (150, 96, 48))
+    c.outline()
+    c.save("hay_bale.png")
+
+
 # --- Ground tiles -------------------------------------------------------------
 
 TILE = 16                      # every ground tile matches the 16px grass and fences
@@ -352,6 +533,10 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     coop().save("coop.png")
     doghouse().save("doghouse.png")
+    barn().save("barn.png")
+    barn_frame(); crate_slot(); hay_bale()
+    barn_wall(); straw_floor(); beam(); lantern()
+    settings_cog()
     tiles = ROOT / "static/tilesets"
     for tilled in (False, True):
         for wet in (False, True):

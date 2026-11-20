@@ -16,5 +16,5 @@ pause_seconds = Vector2(1.5, 5)
 step_length = Vector2(10, 30)
 target_candidates = 6
 elbow_room = 20.0
-spawn_spot = Vector2(136, 138)
-roam = Rect2(124, 130, 28, 12)
+spawn_spot = Vector2(142, 118)
+roam = Rect2(134, 102, 18, 30)

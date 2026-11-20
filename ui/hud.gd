@@ -1,6 +1,8 @@
 extends CanvasLayer
 
 @export var inventory_slot_scene: PackedScene
+## Slots inside the barn window look like little wooden crates.
+@export var barn_slot_texture: Texture2D
 
 @export_group("Slot Sizes")
 @export var inventory_slot_size: int = 92
@@ -27,6 +29,15 @@ extends CanvasLayer
 @export var fly_icon_size: int = 56
 @export var fly_land_scale: float = 0.55
 @export var fly_target_bump: float = 1.18
+## Backpack pickups fly to the first node in this group (the hub's barn).
+@export var barn_group: StringName = &"barn"
+
+@export_group("Settings")
+@export var settings_hover_tint: Color = Color(1.2, 1.15, 1.05)
+
+@export_group("Barn Interior")
+## Size the barn backdrop is designed at; it's scaled to cover the window.
+@export var barn_design_size: Vector2 = Vector2(1152, 648)
 
 @export_group("Keys")
 @export var open_inventory_key: Key = KEY_I
@@ -43,10 +54,13 @@ extends CanvasLayer
 @onready var _hotbar_row: HBoxContainer = %HotbarRow
 @onready var _hand_row: HBoxContainer = %HandRow
 @onready var _bottom_bar: Control = %BottomBar
-@onready var _barn_button: Button = %BarnButton
 @onready var _close_button: Button = %CloseButton
 @onready var _reset_button: Button = %ResetButton
 @onready var _cursor_view: Control = %CursorView
+@onready var _barn_stage: Control = %Stage
+@onready var _settings_button: TextureButton = %SettingsButton
+@onready var _settings_screen: Control = %SettingsScreen
+@onready var _settings_close: Button = %SettingsClose
 @onready var _cursor_icon: TextureRect = %CursorIcon
 @onready var _cursor_count: Label = %CursorCount
 
@@ -63,13 +77,16 @@ func _ready() -> void:
 
 	for i in GameState.hotbar_size:
 		_hotbar_slots.append(_add_slot(_hotbar_row, "hotbar", i, hotbar_slot_size))
-		_hand_slots.append(_add_slot(_hand_row, "hotbar", i, hand_slot_size))
+		_hand_slots.append(_add_slot(_hand_row, "hotbar", i, hand_slot_size, barn_slot_texture))
 	for i in GameState.inventory_size():
-		_inv_slots.append(_add_slot(_inv_grid, "inventory", i, inventory_slot_size))
+		_inv_slots.append(_add_slot(_inv_grid, "inventory", i, inventory_slot_size, barn_slot_texture))
 
-	_barn_button.pressed.connect(_toggle_inventory)
 	_close_button.pressed.connect(_set_inventory_open.bind(false))
 	_reset_button.pressed.connect(_on_reset_pressed)
+	_settings_button.pressed.connect(_set_settings_open.bind(true))
+	_settings_close.pressed.connect(_set_settings_open.bind(false))
+	_settings_button.mouse_entered.connect(func(): _settings_button.modulate = settings_hover_tint)
+	_settings_button.mouse_exited.connect(func(): _settings_button.modulate = Color.WHITE)
 	_disarm_reset()
 
 	GameState.money_changed.connect(_on_money_changed)
@@ -86,8 +103,11 @@ func _ready() -> void:
 	_refresh_hotbar()
 	_refresh_inventory()
 
-func _add_slot(parent: Node, container_id: String, index: int, size: int) -> InventorySlot:
+func _add_slot(parent: Node, container_id: String, index: int, size: int,
+		texture: Texture2D = null) -> InventorySlot:
 	var slot: InventorySlot = inventory_slot_scene.instantiate()
+	if texture:
+		slot.slot_texture = texture
 	slot.container_id = container_id
 	slot.index = index
 	slot.slot_size = size
@@ -139,6 +159,7 @@ func _on_slot_shift_clicked(container_id: String, index: int) -> void:
 func _on_reset_pressed() -> void:
 	if _reset_armed_left > 0.0:
 		_disarm_reset()
+		_set_settings_open(false)
 		_set_inventory_open(false)
 		GameState.reset_progress()
 		return
@@ -152,7 +173,8 @@ func _disarm_reset() -> void:
 	_reset_button.remove_theme_color_override("font_color")
 
 ## Shows where a harvest went: it flies to the hand slot it landed in, or to
-## the barn button when it went into the backpack.
+## the barn in the hub (any node in the `barn_group` group) when it went into
+## the backpack.
 func _on_item_collected(item_id: StringName, container_name: String, index: int,
 		from_screen: Vector2) -> void:
 	if from_screen == Vector2.INF or _inventory_screen.visible:
@@ -160,9 +182,19 @@ func _on_item_collected(item_id: StringName, container_name: String, index: int,
 	var item: ItemData = ItemDatabase.get_item(item_id)
 	if item == null or item.icon == null:
 		return
-	var target: Control = _barn_button
+	var landing_point := Vector2.INF
+	var on_land: Callable
 	if container_name == "hotbar" and index >= 0 and index < _hotbar_slots.size():
-		target = _hotbar_slots[index]
+		var slot: Control = _hotbar_slots[index]
+		landing_point = slot.get_global_rect().get_center()
+		on_land = _bump.bind(slot)
+	else:
+		var barn := get_tree().get_first_node_in_group(barn_group) as Node2D
+		if barn == null:
+			return
+		var height: float = barn.texture.get_size().y if barn.get("texture") else 0.0
+		landing_point = barn.get_global_transform_with_canvas() * Vector2(0, -height * 0.5)
+		on_land = barn.bump if barn.has_method("bump") else Callable()
 
 	var icon := TextureRect.new()
 	icon.texture = item.icon
@@ -175,13 +207,14 @@ func _on_item_collected(item_id: StringName, container_name: String, index: int,
 	icon.z_index = 50
 	add_child(icon)
 
-	var landing := target.get_global_rect().get_center() - icon.size * 0.5
+	var landing := landing_point - icon.size * 0.5
 	var tween := create_tween().set_parallel(true)
 	tween.tween_property(icon, "position", landing, fly_seconds) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(icon, "scale", Vector2.ONE * fly_land_scale, fly_seconds)
 	tween.chain().tween_callback(icon.queue_free)
-	tween.chain().tween_callback(_bump.bind(target))
+	if on_land.is_valid():
+		tween.chain().tween_callback(on_land)
 
 func _bump(target: Control) -> void:
 	if not is_instance_valid(target):
@@ -225,7 +258,10 @@ func _fit_bottom_hud() -> void:
 	_bottom_bar.scale = Vector2(factor, factor)
 
 func _fit_inventory_screen() -> void:
-	if not auto_fit_inventory or not _inventory_screen.visible:
+	if not _inventory_screen.visible:
+		return
+	_fit_barn_backdrop()
+	if not auto_fit_inventory:
 		return
 	_inv_center.scale = Vector2.ONE
 	_inv_center.position = Vector2.ZERO
@@ -247,6 +283,23 @@ func _fit_inventory_screen() -> void:
 	_inv_center.position = (screen - natural * factor) * 0.5 - window_offset * factor
 	_cursor_view.scale = Vector2(factor, factor)
 
+func _set_settings_open(open: bool) -> void:
+	if not open:
+		_disarm_reset()
+	_settings_screen.visible = open
+
+## Opens the barn storage window; the barn building in the hub calls this.
+func open_inventory() -> void:
+	_set_inventory_open(true)
+
+## Scales the barn interior to fill the window (cropping the edges rather
+## than letterboxing, so it always feels like you're standing inside).
+func _fit_barn_backdrop() -> void:
+	var screen := get_viewport().get_visible_rect().size
+	var factor := maxf(screen.x / barn_design_size.x, screen.y / barn_design_size.y)
+	_barn_stage.scale = Vector2(factor, factor)
+	_barn_stage.position = ((screen - barn_design_size * factor) * 0.5).floor()
+
 func _toggle_inventory() -> void:
 	_set_inventory_open(not _inventory_screen.visible)
 
@@ -255,6 +308,7 @@ func _set_inventory_open(open: bool) -> void:
 		_disarm_reset()
 		GameState.return_cursor()
 	_inventory_screen.visible = open
+	_settings_button.visible = not open
 	if open:
 		_refresh_inventory()
 		_refresh_hotbar()
@@ -266,6 +320,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	var key: Key = event.keycode
 	if key >= hotbar_first_key and key < hotbar_first_key + GameState.hotbar_size:
 		GameState.select_hotbar(key - hotbar_first_key)
+		get_viewport().set_input_as_handled()
+		return
+	if _settings_screen.visible:
+		if key == close_inventory_key:
+			_set_settings_open(false)
 		get_viewport().set_input_as_handled()
 		return
 	if key == open_inventory_key or key == open_inventory_alt_key:

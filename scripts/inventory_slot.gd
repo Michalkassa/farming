@@ -70,10 +70,14 @@ func _apply_size() -> void:
 	_count_label.add_theme_font_size_override("font_size",
 		maxi(count_font_min_size, int(slot_size * count_font_ratio)))
 
+## Each slot gets its own copy of the panel style, so changing one slot's
+## texture (e.g. the barn's crates) never repaints every other slot.
 func _apply_tint() -> void:
 	var style := get_theme_stylebox("panel")
 	if style is StyleBoxTexture:
-		style.texture = sell_texture if is_sell else slot_texture
+		var own: StyleBoxTexture = style.duplicate()
+		own.texture = sell_texture if is_sell else slot_texture
+		add_theme_stylebox_override("panel", own)
 
 func _stack() -> ItemStack:
 	var cont := GameState.container(container_id)
