@@ -264,9 +264,9 @@ def coop(k=1.5):
     return c
 
 
-# --- Raised beds -------------------------------------------------------------
+# --- Ground tiles -------------------------------------------------------------
 
-BED = 20                       # one plot, in world pixels
+TILE = 16                      # every ground tile matches the 16px grass and fences
 SOIL = {
     "dry": ((156, 90, 60), (124, 72, 48), (177, 102, 68)),
     "wet": ((80, 48, 34), (64, 38, 27), (91, 54, 38)),
@@ -275,55 +275,68 @@ FURROW = {
     "dry": ((188, 122, 82), (106, 63, 42)),
     "wet": ((104, 64, 46), (52, 31, 22)),
 }
+SAND, SAND_DK, SAND_LT = (236, 206, 112), (214, 182, 94), (246, 222, 140)
 
 
 def raised_bed(wet=False, tilled=False):
-    """20x20 plot: a wooden raised bed seen from above and slightly in front,
+    """16x16 plot: a wooden raised bed seen from above and slightly in front,
     so the top rim and the front board give it depth."""
-    c = Canvas(BED, BED)
+    c = Canvas(TILE, TILE)
     base, dark, light = SOIL["wet" if wet else "dry"]
-    face = BED - 5             # rows 0..14 are the top, 15..18 the front board
-    # Wooden rim around the top face.
-    c.rect(0, 0, BED - 1, face, WOOD)
-    c.rect(1, 0, BED - 2, 0, WOOD_LT)
+    face = TILE - 4            # rows 0..11 are the top, 12..14 the front board
+    c.rect(0, 0, TILE - 1, face, WOOD)
+    c.rect(1, 0, TILE - 2, 0, WOOD_LT)
     c.rect(0, 1, 0, face - 1, WOOD_LT)
-    c.rect(BED - 1, 1, BED - 1, face - 1, WOOD_DK)
-    # Soil, sunk inside the rim: darker top edge reads as the inner wall.
-    c.rect(2, 2, BED - 3, face - 2, base)
-    c.rect(2, 2, BED - 3, 2, dark)
+    c.rect(TILE - 1, 1, TILE - 1, face - 1, WOOD_DK)
+    # Soil sunk inside the rim; the darker top/left edge reads as the inner wall.
+    c.rect(2, 2, TILE - 3, face - 2, base)
+    c.rect(2, 2, TILE - 3, 2, dark)
     c.rect(2, 2, 2, face - 2, dark)
     if tilled:
         hi, lo = FURROW["wet" if wet else "dry"]
-        for y in (5, 9, 12):
-            c.rect(4, y - 1, BED - 5, y - 1, hi)
-            c.rect(4, y, BED - 5, y, lo)
+        for y in (5, 8):
+            c.rect(4, y - 1, TILE - 5, y - 1, hi)
+            c.rect(4, y, TILE - 5, y, lo)
     else:
-        for x, y in ((5, 5), (12, 4), (8, 9), (15, 10), (4, 11), (11, 12), (14, 6)):
+        for x, y in ((5, 4), (10, 5), (7, 8), (12, 8), (4, 9)):
             c.put(x, y, light if (x + y) % 2 else dark)
-    # Front board: the side of the bed facing the camera.
-    c.rect(0, face + 1, BED - 1, BED - 2, WOOD_DK)
-    c.rect(0, face + 1, BED - 1, face + 1, WOOD)
-    for x in (4, 10, 15):
+    # Front board facing the camera.
+    c.rect(0, face + 1, TILE - 1, TILE - 2, WOOD_DK)
+    c.rect(0, face + 1, TILE - 1, face + 1, WOOD)
+    for x in (4, 11):
         c.put(x, face + 2, (90, 54, 28))
-    # Outline: top and sides, then the ground line under the board.
-    c.rect(0, 0, BED - 1, 0, OUTLINE)
-    c.rect(0, 0, 0, BED - 2, OUTLINE)
-    c.rect(BED - 1, 0, BED - 1, BED - 2, OUTLINE)
-    c.rect(0, BED - 1, BED - 1, BED - 1, OUTLINE)
-    c.rect(1, face, BED - 2, face, OUTLINE)
+    c.rect(0, 0, TILE - 1, 0, OUTLINE)
+    c.rect(0, 0, 0, TILE - 2, OUTLINE)
+    c.rect(TILE - 1, 0, TILE - 1, TILE - 2, OUTLINE)
+    c.rect(0, TILE - 1, TILE - 1, TILE - 1, OUTLINE)
+    c.rect(1, face, TILE - 2, face, OUTLINE)
+    return c
+
+
+def path_sand():
+    """16x16 sand that tiles seamlessly in every direction; the path script
+    adds edges only where a path tile meets grass."""
+    c = Canvas(TILE, TILE)
+    c.rect(0, 0, TILE - 1, TILE - 1, SAND)
+    for x, y in ((3, 2), (11, 4), (6, 9), (14, 11), (1, 13), (9, 14)):
+        c.put(x, y, SAND_DK)
+    for x, y in ((4, 2), (12, 4), (7, 9), (2, 6), (13, 1)):
+        c.put(x, y, SAND_LT)
+    c.rect(9, 6, 10, 6, SAND_DK)
     return c
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     coop().save("coop.png")
-    beds = ROOT / "static/tilesets"
+    tiles = ROOT / "static/tilesets"
     for tilled in (False, True):
         for wet in (False, True):
             name = f"bed_{'tilled' if tilled else 'bare'}_{'wet' if wet else 'dry'}.png"
-            im = raised_bed(wet, tilled)
-            im.save(name)
-            (OUT / name).replace(beds / name)
+            raised_bed(wet, tilled).save(name)
+            (OUT / name).replace(tiles / name)
+    path_sand().save("path_sand.png")
+    (OUT / "path_sand.png").replace(tiles / "path_sand.png")
     awning().save("awning.png")
     planks(WOOD, WOOD_DK, WOOD_LT, "counter_front.png")
     planks(BACK, BACK_DK, BACK_LT, "back_wall.png")

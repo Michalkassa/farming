@@ -47,7 +47,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2teum"]
-size = Vector2(20, 20)
+size = Vector2(16, 16)
 
 [node name="GrowingZone" type="StaticBody2D" unique_id=69069094]
 script = ExtResource("1_tsn3r")
