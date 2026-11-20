@@ -1,0 +1,424 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/shop_screen.gd" id="1_screen"]
+[ext_resource type="PackedScene" path="res://ui/stall_card.tscn" id="2_card"]
+[ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Enviroment/Objects/Objects_free.png" id="3_objects"]
+[ext_resource type="Texture2D" path="res://static/shop/back_wall.png" id="6_wall"]
+[ext_resource type="Texture2D" path="res://static/shop/shelf.png" id="7_shelf"]
+[ext_resource type="Texture2D" path="res://static/shop/post.png" id="8_post"]
+[ext_resource type="Texture2D" path="res://static/shop/awning.png" id="9_awning"]
+[ext_resource type="Texture2D" path="res://static/shop/counter_top.png" id="10_top"]
+[ext_resource type="Texture2D" path="res://static/shop/counter_front.png" id="11_front"]
+
+[sub_resource type="Gradient" id="SkyGradient"]
+colors = PackedColorArray(0.486, 0.769, 0.925, 1, 0.71, 0.886, 0.957, 1)
+
+[sub_resource type="GradientTexture2D" id="SkyTexture"]
+gradient = SubResource("SkyGradient")
+width = 4
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="AtlasTexture" id="Scarecrow"]
+atlas = ExtResource("3_objects")
+region = Rect2(0, 2, 16, 30)
+
+[sub_resource type="ButtonGroup" id="TabGroup"]
+
+[node name="ShopScreen" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_screen")
+card_scene = ExtResource("2_card")
+
+[node name="Screen" type="Control" parent="."]
+texture_filter = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Sky" type="TextureRect" parent="Screen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = SubResource("SkyTexture")
+expand_mode = 1
+
+[node name="Grass" type="ColorRect" parent="Screen"]
+layout_mode = 0
+offset_top = 470.0
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.357, 0.69, 0.29, 1)
+
+[node name="Stage" type="Control" parent="Screen"]
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+
+[node name="BackWall" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 110.0
+offset_right = 303.0
+offset_bottom = 176.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("6_wall")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ShelfL1" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 250.0
+offset_right = 206.0
+offset_bottom = 256.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("7_shelf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ShelfL2" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 350.0
+offset_right = 206.0
+offset_bottom = 356.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("7_shelf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ShelfR1" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 722.0
+offset_top = 250.0
+offset_right = 778.0
+offset_bottom = 256.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("7_shelf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ShelfR2" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 722.0
+offset_top = 350.0
+offset_right = 778.0
+offset_bottom = 356.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("7_shelf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ShelfGoodsL1" type="HBoxContainer" parent="Screen/Stage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 150.0
+offset_top = 194.0
+offset_right = 430.0
+offset_bottom = 250.0
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="ShelfGoodsL2" type="HBoxContainer" parent="Screen/Stage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 150.0
+offset_top = 294.0
+offset_right = 430.0
+offset_bottom = 350.0
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="ShelfGoodsR1" type="HBoxContainer" parent="Screen/Stage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 722.0
+offset_top = 194.0
+offset_right = 1002.0
+offset_bottom = 250.0
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="ShelfGoodsR2" type="HBoxContainer" parent="Screen/Stage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 722.0
+offset_top = 294.0
+offset_right = 1002.0
+offset_bottom = 350.0
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="Keeper" type="TextureRect" parent="Screen/Stage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 568.0
+offset_top = 404.0
+offset_right = 584.0
+offset_bottom = 434.0
+scale = Vector2(8, 8)
+pivot_offset = Vector2(8, 30)
+mouse_filter = 2
+texture = SubResource("Scarecrow")
+expand_mode = 1
+
+[node name="PostL" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 84.0
+offset_top = 60.0
+offset_right = 92.0
+offset_bottom = 178.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("8_post")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="PostR" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 1028.0
+offset_top = 60.0
+offset_right = 1036.0
+offset_bottom = 178.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("8_post")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="RidgeOutline" type="ColorRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 57.0
+offset_top = 17.0
+offset_right = 1095.0
+offset_bottom = 45.0
+mouse_filter = 2
+color = Color(0.204, 0.118, 0.118, 1)
+
+[node name="Ridge" type="ColorRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 20.0
+offset_right = 1092.0
+offset_bottom = 42.0
+mouse_filter = 2
+color = Color(0.667, 0.18, 0.188, 1)
+
+[node name="Awning" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 40.0
+offset_right = 267.0
+offset_bottom = 54.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("9_awning")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="SignCenter" type="CenterContainer" parent="Screen/Stage"]
+layout_mode = 0
+offset_top = 2.0
+offset_right = 1152.0
+offset_bottom = 50.0
+mouse_filter = 2
+
+[node name="Plaque" type="PanelContainer" parent="Screen/Stage/SignCenter"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"SignPlaque"
+
+[node name="M" type="MarginContainer" parent="Screen/Stage/SignCenter/Plaque"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 4
+
+[node name="Text" type="Label" parent="Screen/Stage/SignCenter/Plaque/M"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 27
+text = "FARM STALL"
+horizontal_alignment = 1
+
+[node name="CounterTop" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 420.0
+offset_right = 261.0
+offset_bottom = 428.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("10_top")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="CounterFront" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 456.0
+offset_right = 267.0
+offset_bottom = 496.0
+scale = Vector2(5, 5)
+mouse_filter = 2
+texture = ExtResource("11_front")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Tabs" type="HBoxContainer" parent="Screen/Stage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 126.0
+offset_top = 458.0
+offset_right = 1026.0
+offset_bottom = 502.0
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="Seeds" type="Button" parent="Screen/Stage/Tabs"]
+custom_minimum_size = Vector2(124, 44)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("TabGroup")
+theme_override_font_sizes/font_size = 18
+text = "Seeds"
+
+[node name="Animals" type="Button" parent="Screen/Stage/Tabs"]
+custom_minimum_size = Vector2(124, 44)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("TabGroup")
+theme_override_font_sizes/font_size = 18
+text = "Animals"
+
+[node name="Tools" type="Button" parent="Screen/Stage/Tabs"]
+custom_minimum_size = Vector2(124, 44)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("TabGroup")
+theme_override_font_sizes/font_size = 18
+text = "Tools"
+
+[node name="Sell" type="Button" parent="Screen/Stage/Tabs"]
+custom_minimum_size = Vector2(124, 44)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("TabGroup")
+theme_override_font_sizes/font_size = 18
+text = "Sell"
+
+[node name="Wine" type="Button" parent="Screen/Stage/Tabs"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(124, 44)
+layout_mode = 2
+tooltip_text = "Coming soon"
+focus_mode = 0
+disabled = true
+theme_override_font_sizes/font_size = 18
+text = "Wine"
+
+[node name="SellAll" type="Button" parent="Screen/Stage/Tabs"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 18
+text = "Sell produce €0"
+
+[node name="GoodsScroll" type="ScrollContainer" parent="Screen/Stage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 126.0
+offset_top = 506.0
+offset_right = 1026.0
+offset_bottom = 648.0
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
+scroll_deadzone = 8
+
+[node name="Goods" type="HBoxContainer" parent="Screen/Stage/GoodsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+theme_override_constants/separation = 0
+
+[node name="EmptyHint" type="Label" parent="Screen/Stage"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 126.0
+offset_top = 530.0
+offset_right = 1026.0
+offset_bottom = 620.0
+theme_override_colors/font_color = Color(1, 0.97, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.09, 0.05, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 18
+text = "Nothing to sell yet. Harvest crops or collect eggs and milk!"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="BackButton" type="Button" parent="Screen/Stage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 14.0
+offset_right = 150.0
+offset_bottom = 62.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "< Farm"
+
+[node name="MoneyCorner" type="HBoxContainer" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 936.0
+offset_top = 14.0
+offset_right = 1136.0
+offset_bottom = 62.0
+mouse_filter = 2
+alignment = 2
+
+[node name="MoneyBadge" type="PanelContainer" parent="Screen/Stage/MoneyCorner"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="M" type="MarginContainer" parent="Screen/Stage/MoneyCorner/MoneyBadge"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 6
+
+[node name="MoneyLabel" type="Label" parent="Screen/Stage/MoneyCorner/MoneyBadge/M"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.25, 1)
+theme_override_font_sizes/font_size = 27
+text = "€0"
