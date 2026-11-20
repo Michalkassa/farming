@@ -1,13 +1,11 @@
 extends CanvasLayer
 
 @export var inventory_slot_scene: PackedScene
-@export var shop_row_scene: PackedScene
 
 @export_group("Slot Sizes")
 @export var inventory_slot_size: int = 92
 @export var hand_slot_size: int = 84
 @export var hotbar_slot_size: int = 96
-@export var sell_slot_size: int = 84
 
 @export_group("Fit")
 @export var screen_padding: float = 32.0
@@ -17,8 +15,6 @@ extends CanvasLayer
 
 @export_group("Text")
 @export var money_format: String = "€%d"
-@export var sell_idle_text: String = "Sell"
-@export var sell_value_format: String = "Sell €%d"
 
 @export_group("New Game Button")
 @export var reset_label: String = "New Game"
@@ -43,14 +39,10 @@ extends CanvasLayer
 @onready var _inv_window: Control = %Window
 @onready var _hud_money_label: Label = %HudMoneyLabel
 @onready var _inv_money_label: Label = %InvMoneyLabel
-@onready var _shop_list: VBoxContainer = %ShopList
-@onready var _shop_tabs: HBoxContainer = %ShopTabs
-@onready var _sell_grid: GridContainer = %SellGrid
 @onready var _inv_grid: GridContainer = %InvGrid
 @onready var _hotbar_row: HBoxContainer = %HotbarRow
 @onready var _hand_row: HBoxContainer = %HandRow
 @onready var _bottom_bar: Control = %BottomBar
-@onready var _sell_button: Button = %SellButton
 @onready var _barn_button: Button = %BarnButton
 @onready var _close_button: Button = %CloseButton
 @onready var _reset_button: Button = %ResetButton
@@ -61,42 +53,30 @@ extends CanvasLayer
 var _hotbar_slots: Array[InventorySlot] = []
 var _hand_slots: Array[InventorySlot] = []
 var _inv_slots: Array[InventorySlot] = []
-var _sell_slots: Array[InventorySlot] = []
 var _reset_armed_left: float = 0.0
-var _shop_category: String = "seeds"
 
 func _ready() -> void:
 	_inventory_screen.visible = false
 	_cursor_view.visible = false
 
 	_inv_grid.columns = GameState.inventory_columns
-	_sell_grid.columns = GameState.sell_columns
 
 	for i in GameState.hotbar_size:
 		_hotbar_slots.append(_add_slot(_hotbar_row, "hotbar", i, hotbar_slot_size))
 		_hand_slots.append(_add_slot(_hand_row, "hotbar", i, hand_slot_size))
 	for i in GameState.inventory_size():
 		_inv_slots.append(_add_slot(_inv_grid, "inventory", i, inventory_slot_size))
-	for i in GameState.sell_size():
-		_sell_slots.append(_add_slot(_sell_grid, "sell", i, sell_slot_size, true))
-	for tab in _shop_tabs.get_children():
-		tab.pressed.connect(_on_shop_tab.bind(tab.name.to_lower()))
-	_populate_shop()
 
 	_barn_button.pressed.connect(_toggle_inventory)
 	_close_button.pressed.connect(_set_inventory_open.bind(false))
-	_sell_button.pressed.connect(_on_sell_pressed)
 	_reset_button.pressed.connect(_on_reset_pressed)
 	_disarm_reset()
 
 	GameState.money_changed.connect(_on_money_changed)
 	GameState.inventory_changed.connect(_refresh_inventory)
 	GameState.hotbar_changed.connect(_refresh_hotbar)
-	GameState.sell_changed.connect(_refresh_sell)
 	GameState.hotbar_selection_changed.connect(_on_hotbar_selection_changed)
 	GameState.cursor_changed.connect(_on_cursor_changed)
-	GameState.animals_changed.connect(_populate_shop)
-	GameState.tools_changed.connect(_populate_shop)
 	GameState.item_collected.connect(_on_item_collected)
 	get_viewport().size_changed.connect(_fit_ui)
 
@@ -105,41 +85,17 @@ func _ready() -> void:
 	_on_hotbar_selection_changed(GameState.selected_hotbar)
 	_refresh_hotbar()
 	_refresh_inventory()
-	_refresh_sell()
 
-func _add_slot(parent: Node, container_id: String, index: int, size: int,
-		is_sell := false) -> InventorySlot:
+func _add_slot(parent: Node, container_id: String, index: int, size: int) -> InventorySlot:
 	var slot: InventorySlot = inventory_slot_scene.instantiate()
 	slot.container_id = container_id
 	slot.index = index
 	slot.slot_size = size
-	slot.is_sell = is_sell
 	slot.shift_clicked.connect(_on_slot_shift_clicked)
 	slot.clicked.connect(_on_slot_clicked)
 	slot.right_clicked.connect(_on_slot_right_clicked)
 	parent.add_child(slot)
 	return slot
-
-func _on_shop_tab(category: String) -> void:
-	_shop_category = category
-	_populate_shop()
-
-func _in_shop_category(item: ItemData) -> bool:
-	match _shop_category:
-		"animals": return item.is_animal()
-		"tools": return item.is_tool()
-		_: return item.is_seed()
-
-func _populate_shop() -> void:
-	for child in _shop_list.get_children():
-		child.queue_free()
-	for item in ItemDatabase.shop_items():
-		if not _in_shop_category(item):
-			continue
-		var row: ShopRow = shop_row_scene.instantiate()
-		row.item = item
-		row.buy_pressed.connect(_on_buy_pressed)
-		_shop_list.add_child(row)
 
 func _on_cursor_changed() -> void:
 	var stack: ItemStack = GameState.cursor
@@ -158,9 +114,6 @@ func _process(delta: float) -> void:
 		if _reset_armed_left <= 0.0:
 			_disarm_reset()
 
-func _on_buy_pressed(item_id: StringName) -> void:
-	GameState.buy(item_id)
-
 func _on_slot_clicked(container_id: String, index: int) -> void:
 	if _inventory_screen.visible:
 		GameState.click_slot(container_id, index, false)
@@ -176,13 +129,11 @@ func _on_hotbar_selection_changed(index: int) -> void:
 		_hotbar_slots[i].selected = (i == index)
 		_hand_slots[i].selected = (i == index)
 
+## Shift-click swaps a stack between the hand and the backpack.
 func _on_slot_shift_clicked(container_id: String, index: int) -> void:
-	if not _inventory_screen.visible or container_id == "sell":
+	if not _inventory_screen.visible:
 		return
-	GameState.quick_move(container_id, index, "sell")
-
-func _on_sell_pressed() -> void:
-	GameState.sell_all_staged()
+	GameState.quick_move(container_id, index, "inventory" if container_id == "hotbar" else "hotbar")
 
 ## First press arms the button, a second press within the timeout wipes the save.
 func _on_reset_pressed() -> void:
@@ -255,17 +206,6 @@ func _refresh_inventory() -> void:
 	for slot in _inv_slots:
 		slot.refresh()
 
-func _refresh_sell() -> void:
-	for slot in _sell_slots:
-		slot.refresh()
-	var has_items := false
-	for s in GameState.sell_grid:
-		if s != null:
-			has_items = true
-			break
-	_sell_button.disabled = not has_items
-	_sell_button.text = sell_value_format % GameState.staged_value() if has_items else sell_idle_text
-
 func _fit_ui() -> void:
 	_fit_bottom_hud()
 	_fit_inventory_screen()
@@ -299,8 +239,12 @@ func _fit_inventory_screen() -> void:
 	var screen := get_viewport().get_visible_rect().size
 	var room := screen - Vector2.ONE * screen_padding
 	var factor := minf(1.0, minf(room.x / natural.x, room.y / natural.y))
+	# The centre container may not have re-laid out yet, so work out where it
+	# will put the window instead of reading the window's (possibly stale) position.
+	_inv_center.size = screen
+	var window_offset := (screen - natural) * 0.5
 	_inv_center.scale = Vector2(factor, factor)
-	_inv_center.position = (screen - natural * factor) * 0.5 - _inv_window.position * factor
+	_inv_center.position = (screen - natural * factor) * 0.5 - window_offset * factor
 	_cursor_view.scale = Vector2(factor, factor)
 
 func _toggle_inventory() -> void:
@@ -309,13 +253,11 @@ func _toggle_inventory() -> void:
 func _set_inventory_open(open: bool) -> void:
 	if not open and _inventory_screen.visible:
 		_disarm_reset()
-		GameState.return_staged()
 		GameState.return_cursor()
 	_inventory_screen.visible = open
 	if open:
 		_refresh_inventory()
 		_refresh_hotbar()
-		_refresh_sell()
 		_fit_inventory_screen()
 
 func _unhandled_input(event: InputEvent) -> void:

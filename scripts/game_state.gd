@@ -64,6 +64,9 @@ func _ready() -> void:
 	if not _load_game():
 		money = starting_money
 		call_deferred("_grant_starter_items")
+	else:
+		# Selling moved to the shop stall; hand back anything left in the old sell box.
+		return_staged()
 	_save_enabled = true
 	_autosave_left = autosave_seconds
 
@@ -282,6 +285,25 @@ func has_animal(kind: StringName) -> bool:
 func growth_multiplier() -> float:
 	return (1.0 + dog_growth_bonus) if has_animal(&"dog") else 1.0
 
+## Why a purchase would fail right now, or &"" when it would go through:
+## &"unknown", &"owned", &"pen_full", &"money" or &"pack_full".
+func buy_block_reason(item_id: StringName) -> StringName:
+	var item: ItemData = ItemDatabase.get_item(item_id)
+	if item == null or item.buy_price <= 0:
+		return &"unknown"
+	if item.is_tool() and tool_area_owned(item.tool_kind) >= item.tool_area:
+		return &"owned"
+	if item.is_animal() and not can_buy_animal(item.animal_kind):
+		return &"pen_full"
+	if not can_afford(item.buy_price):
+		return &"money"
+	if item.is_tool():
+		if tool_area_owned(item.tool_kind) == 0 and not has_space_for(item_id):
+			return &"pack_full"
+	elif not item.is_animal() and not has_space_for(item_id):
+		return &"pack_full"
+	return &""
+
 func buy(item_id: StringName) -> bool:
 	var item: ItemData = ItemDatabase.get_item(item_id)
 	if item == null or item.buy_price <= 0:
@@ -376,6 +398,60 @@ func quick_move(from_container: String, from_index: int, to_container: String) -
 		from[from_index] = null
 	_emit_changed(from_container)
 	return true
+
+## How many of an item sit in the hand and backpack together.
+func count_owned(item_id: StringName) -> int:
+	var total := 0
+	for cont in [hotbar, inventory]:
+		for slot: ItemStack in cont:
+			if slot != null and slot.item_id == item_id:
+				total += slot.count
+	return total
+
+## Things the stall farmer will buy off you: anything with a price except tools.
+func sellable_items() -> Array:
+	var seen: Dictionary = {}
+	var result: Array = []
+	for cont in [hotbar, inventory]:
+		for slot: ItemStack in cont:
+			if slot == null or seen.has(slot.item_id):
+				continue
+			var item: ItemData = ItemDatabase.get_item(slot.item_id)
+			if item and item.sell_price > 0 and not item.is_tool():
+				seen[slot.item_id] = true
+				result.append(item)
+	result.sort_custom(func(a, b): return a.sell_price > b.sell_price)
+	return result
+
+## Sells up to `count` of an item to the stall, backpack first so the hand
+## keeps what the player is holding. Returns the money earned.
+func sell_item(item_id: StringName, count: int) -> int:
+	var item: ItemData = ItemDatabase.get_item(item_id)
+	if item == null or item.sell_price <= 0 or item.is_tool() or count <= 0:
+		return 0
+	var sold := 0
+	for cont_name in ["inventory", "hotbar"]:
+		var cont := container(cont_name)
+		var touched := false
+		for i in range(cont.size() - 1, -1, -1):
+			if sold >= count:
+				break
+			var slot: ItemStack = cont[i]
+			if slot == null or slot.item_id != item_id:
+				continue
+			var taken: int = mini(slot.count, count - sold)
+			slot.count -= taken
+			sold += taken
+			touched = true
+			if slot.count <= 0:
+				cont[i] = null
+		if touched:
+			_emit_changed(cont_name)
+	if sold <= 0:
+		return 0
+	var earned := sold * item.sell_price
+	set_money(money + earned)
+	return earned
 
 func sell_all_staged() -> int:
 	var total := 0
