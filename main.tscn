@@ -19,6 +19,7 @@
 [ext_resource type="Texture2D" path="res://static/shop/hub_stall.png" id="h_stall"]
 [ext_resource type="Texture2D" path="res://static/shop/coop.png" id="h_coop"]
 [ext_resource type="Texture2D" path="res://static/shop/doghouse.png" id="h_doghouse"]
+[ext_resource type="Texture2D" path="res://static/shop/barn.png" id="h_barn"]
 [ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Buildings/Pre-made/premade-buildings_free.png" id="h_buildings"]
 [ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Enviroment/Trees/Trees_free.png" id="h_trees"]
 [ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Enviroment/Decor/Natural_Decor_free.png" id="h_decor"]
@@ -113,13 +114,13 @@ layer_0/tile_data = PackedInt32Array(-458758, 196608, 0, -458757, 196608, 0, -45
 [node name="Paths" type="Node2D" parent="."]
 script = ExtResource("h_paths")
 tile = ExtResource("h_path_sand")
-roads = Array[Rect2i]([Rect2i(-3, 10, 30, 1), Rect2i(3, 7, 1, 3), Rect2i(17, 5, 1, 5), Rect2i(17, 5, 4, 1)])
+roads = Array[Rect2i]([Rect2i(-3, 10, 30, 1), Rect2i(17, 5, 1, 5), Rect2i(17, 5, 4, 1)])
 
 [node name="Decor" type="Node2D" parent="."]
 
 [node name="Scarecrow" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(128, 66)
+position = Vector2(130, 62)
 texture = SubResource("Atlas_scarecrow")
 centered = false
 
@@ -151,291 +152,315 @@ centered = false
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [node name="Grass1" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(81, 130)
+position = Vector2(263, 193)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass2" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(99, -4)
+position = Vector2(20, 1)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass3" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(359, 194)
+position = Vector2(3, 185)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass4" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(332, -5)
+position = Vector2(138, 113)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass5" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(-1, -14)
-texture = SubResource("Atlas_bush")
+position = Vector2(89, 185)
+texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass6" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(216, 181)
-texture = SubResource("Atlas_grass")
+position = Vector2(39, -12)
+texture = SubResource("Atlas_bush")
 centered = false
 
 [node name="Grass7" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(304, 185)
+position = Vector2(362, 182)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass8" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(34, 191)
+position = Vector2(203, 196)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass9" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(148, 185)
+position = Vector2(23, 18)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass10" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(322, 186)
+position = Vector2(281, -11)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass11" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(57, -8)
+position = Vector2(242, 185)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass12" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(128, 194)
+position = Vector2(116, 36)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass13" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(117, 123)
+position = Vector2(129, 196)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass14" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(15, -14)
-texture = SubResource("Atlas_bush")
+position = Vector2(299, -4)
+texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass15" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(142, 136)
-texture = SubResource("Atlas_grass")
+position = Vector2(320, 188)
+texture = SubResource("Atlas_bush")
 centered = false
 
 [node name="Grass16" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(123, -12)
+position = Vector2(60, 189)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass17" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(19, 122)
+position = Vector2(339, 187)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass18" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(41, -11)
+position = Vector2(32, 180)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass19" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(308, -2)
+position = Vector2(104, -11)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass20" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(352, -1)
+position = Vector2(162, 192)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass21" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(290, 181)
+position = Vector2(209, 181)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass22" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(5, 193)
+position = Vector2(146, 186)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass23" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(135, 108)
-texture = SubResource("Atlas_bush")
+position = Vector2(186, 189)
+texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass24" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(354, 180)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass25" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(282, 195)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass26" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(135, 29)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass27" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(340, 183)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass28" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(63, 189)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass29" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(-6, 88)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass30" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(112, 186)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass31" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(251, 181)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass32" type="Sprite2D" parent="Decor"]
 texture_filter = 1
 position = Vector2(-11, 192)
 texture = SubResource("Atlas_bush")
 centered = false
 
+[node name="Grass25" type="Sprite2D" parent="Decor"]
+texture_filter = 1
+position = Vector2(315, -8)
+texture = SubResource("Atlas_grass")
+centered = false
+
+[node name="Grass26" type="Sprite2D" parent="Decor"]
+texture_filter = 1
+position = Vector2(280, 183)
+texture = SubResource("Atlas_grass")
+centered = false
+
+[node name="Grass27" type="Sprite2D" parent="Decor"]
+texture_filter = 1
+position = Vector2(79, -14)
+texture = SubResource("Atlas_grass")
+centered = false
+
+[node name="Grass28" type="Sprite2D" parent="Decor"]
+texture_filter = 1
+position = Vector2(111, 180)
+texture = SubResource("Atlas_grass")
+centered = false
+
+[node name="Grass29" type="Sprite2D" parent="Decor"]
+texture_filter = 1
+position = Vector2(227, 180)
+texture = SubResource("Atlas_grass")
+centered = false
+
+[node name="Grass30" type="Sprite2D" parent="Decor"]
+texture_filter = 1
+position = Vector2(22, 41)
+texture = SubResource("Atlas_grass")
+centered = false
+
+[node name="Grass31" type="Sprite2D" parent="Decor"]
+texture_filter = 1
+position = Vector2(23, 195)
+texture = SubResource("Atlas_grass")
+centered = false
+
+[node name="Grass32" type="Sprite2D" parent="Decor"]
+texture_filter = 1
+position = Vector2(109, 20)
+texture = SubResource("Atlas_grass")
+centered = false
+
 [node name="Grass33" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(286, -11)
-texture = SubResource("Atlas_grass")
+position = Vector2(125, 182)
+texture = SubResource("Atlas_bush")
 centered = false
 
 [node name="Grass34" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(116, 141)
+position = Vector2(140, 43)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass35" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(83, 184)
+position = Vector2(295, 183)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass36" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(194, 188)
+position = Vector2(330, -2)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass37" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(268, 187)
+position = Vector2(134, 99)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass38" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(-2, 142)
+position = Vector2(14, -13)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass39" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(230, 185)
+position = Vector2(46, 183)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass40" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(-7, 1)
+position = Vector2(224, 194)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass41" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(-5, 24)
-texture = SubResource("Atlas_bush")
+position = Vector2(74, 192)
+texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass42" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(169, 183)
-texture = SubResource("Atlas_grass")
+position = Vector2(108, 195)
+texture = SubResource("Atlas_bush")
 centered = false
 
 [node name="Grass43" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(76, -5)
+position = Vector2(54, -12)
 texture = SubResource("Atlas_grass")
 centered = false
 
 [node name="Grass44" type="Sprite2D" parent="Decor"]
 texture_filter = 1
-position = Vector2(-6, 105)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass45" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(-2, 48)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass46" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(135, 14)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass47" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(139, 0)
-texture = SubResource("Atlas_grass")
-centered = false
-
-[node name="Grass48" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(-11, 64)
+position = Vector2(361, 196)
 texture = SubResource("Atlas_grass")
 centered = false
 
@@ -448,130 +473,130 @@ layer_0/tile_data = PackedInt32Array(10, 196608, 1, 65546, 196608, 1, 196618, 19
 [node name="GrowingZones" type="Node2D" parent="." unique_id=919345773]
 
 [node name="GrowingZone" parent="GrowingZones" unique_id=69069094 instance=ExtResource("3_h2yge")]
-position = Vector2(24, 24)
-
-[node name="GrowingZone2" parent="GrowingZones" unique_id=904006210 instance=ExtResource("3_h2yge")]
-position = Vector2(40, 24)
-
-[node name="GrowingZone3" parent="GrowingZones" unique_id=231100037 instance=ExtResource("3_h2yge")]
-position = Vector2(56, 24)
-
-[node name="GrowingZone4" parent="GrowingZones" unique_id=1724626251 instance=ExtResource("3_h2yge")]
-position = Vector2(72, 24)
-
-[node name="GrowingZone5" parent="GrowingZones" unique_id=918303250 instance=ExtResource("3_h2yge")]
-position = Vector2(88, 24)
-
-[node name="GrowingZone6" parent="GrowingZones" unique_id=1321370529 instance=ExtResource("3_h2yge")]
-position = Vector2(104, 24)
-
-[node name="GrowingZone7" parent="GrowingZones" unique_id=1052461194 instance=ExtResource("3_h2yge")]
-position = Vector2(24, 40)
-
-[node name="GrowingZone8" parent="GrowingZones" unique_id=127145404 instance=ExtResource("3_h2yge")]
-position = Vector2(40, 40)
-
-[node name="GrowingZone9" parent="GrowingZones" unique_id=530876526 instance=ExtResource("3_h2yge")]
-position = Vector2(56, 40)
-
-[node name="GrowingZone10" parent="GrowingZones" unique_id=2138852720 instance=ExtResource("3_h2yge")]
-position = Vector2(72, 40)
-
-[node name="GrowingZone11" parent="GrowingZones" unique_id=419151079 instance=ExtResource("3_h2yge")]
-position = Vector2(88, 40)
-
-[node name="GrowingZone12" parent="GrowingZones" unique_id=540370846 instance=ExtResource("3_h2yge")]
-position = Vector2(104, 40)
-
-[node name="GrowingZone13" parent="GrowingZones" unique_id=582581564 instance=ExtResource("3_h2yge")]
-position = Vector2(24, 56)
-
-[node name="GrowingZone14" parent="GrowingZones" unique_id=1362293937 instance=ExtResource("3_h2yge")]
-position = Vector2(40, 56)
-
-[node name="GrowingZone15" parent="GrowingZones" unique_id=1850645380 instance=ExtResource("3_h2yge")]
-position = Vector2(56, 56)
-
-[node name="GrowingZone16" parent="GrowingZones" unique_id=792598032 instance=ExtResource("3_h2yge")]
-position = Vector2(72, 56)
-
-[node name="GrowingZone17" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(88, 56)
-
-[node name="GrowingZone18" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(104, 56)
-
-[node name="GrowingZone19" parent="GrowingZones" instance=ExtResource("3_h2yge")]
 position = Vector2(24, 72)
 
-[node name="GrowingZone20" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone2" parent="GrowingZones" unique_id=904006210 instance=ExtResource("3_h2yge")]
 position = Vector2(40, 72)
 
-[node name="GrowingZone21" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone3" parent="GrowingZones" unique_id=231100037 instance=ExtResource("3_h2yge")]
 position = Vector2(56, 72)
 
-[node name="GrowingZone22" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone4" parent="GrowingZones" unique_id=1724626251 instance=ExtResource("3_h2yge")]
 position = Vector2(72, 72)
 
-[node name="GrowingZone23" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone5" parent="GrowingZones" unique_id=918303250 instance=ExtResource("3_h2yge")]
 position = Vector2(88, 72)
 
-[node name="GrowingZone24" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone6" parent="GrowingZones" unique_id=1321370529 instance=ExtResource("3_h2yge")]
 position = Vector2(104, 72)
 
-[node name="GrowingZone25" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone7" parent="GrowingZones" unique_id=1052461194 instance=ExtResource("3_h2yge")]
 position = Vector2(24, 88)
 
-[node name="GrowingZone26" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone8" parent="GrowingZones" unique_id=127145404 instance=ExtResource("3_h2yge")]
 position = Vector2(40, 88)
 
-[node name="GrowingZone27" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone9" parent="GrowingZones" unique_id=530876526 instance=ExtResource("3_h2yge")]
 position = Vector2(56, 88)
 
-[node name="GrowingZone28" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone10" parent="GrowingZones" unique_id=2138852720 instance=ExtResource("3_h2yge")]
 position = Vector2(72, 88)
 
-[node name="GrowingZone29" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone11" parent="GrowingZones" unique_id=419151079 instance=ExtResource("3_h2yge")]
 position = Vector2(88, 88)
 
-[node name="GrowingZone30" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone12" parent="GrowingZones" unique_id=540370846 instance=ExtResource("3_h2yge")]
 position = Vector2(104, 88)
 
-[node name="GrowingZone31" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone13" parent="GrowingZones" unique_id=582581564 instance=ExtResource("3_h2yge")]
 position = Vector2(24, 104)
 
-[node name="GrowingZone32" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone14" parent="GrowingZones" unique_id=1362293937 instance=ExtResource("3_h2yge")]
 position = Vector2(40, 104)
 
-[node name="GrowingZone33" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone15" parent="GrowingZones" unique_id=1850645380 instance=ExtResource("3_h2yge")]
 position = Vector2(56, 104)
 
-[node name="GrowingZone34" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone16" parent="GrowingZones" unique_id=792598032 instance=ExtResource("3_h2yge")]
 position = Vector2(72, 104)
 
-[node name="GrowingZone35" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone17" parent="GrowingZones" instance=ExtResource("3_h2yge")]
 position = Vector2(88, 104)
 
-[node name="GrowingZone36" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone18" parent="GrowingZones" instance=ExtResource("3_h2yge")]
 position = Vector2(104, 104)
 
+[node name="GrowingZone19" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(24, 120)
+
+[node name="GrowingZone20" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(40, 120)
+
+[node name="GrowingZone21" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(56, 120)
+
+[node name="GrowingZone22" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(72, 120)
+
+[node name="GrowingZone23" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(88, 120)
+
+[node name="GrowingZone24" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(104, 120)
+
+[node name="GrowingZone25" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(24, 136)
+
+[node name="GrowingZone26" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(40, 136)
+
+[node name="GrowingZone27" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(56, 136)
+
+[node name="GrowingZone28" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(72, 136)
+
+[node name="GrowingZone29" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(88, 136)
+
+[node name="GrowingZone30" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(104, 136)
+
+[node name="GrowingZone31" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(24, 152)
+
+[node name="GrowingZone32" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(40, 152)
+
+[node name="GrowingZone33" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(56, 152)
+
+[node name="GrowingZone34" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(72, 152)
+
+[node name="GrowingZone35" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(88, 152)
+
+[node name="GrowingZone36" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(104, 152)
+
 [node name="GrowingZone37" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(120, 24)
-
-[node name="GrowingZone38" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(120, 40)
-
-[node name="GrowingZone39" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(120, 56)
-
-[node name="GrowingZone40" parent="GrowingZones" instance=ExtResource("3_h2yge")]
 position = Vector2(120, 72)
 
-[node name="GrowingZone41" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone38" parent="GrowingZones" instance=ExtResource("3_h2yge")]
 position = Vector2(120, 88)
 
-[node name="GrowingZone42" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+[node name="GrowingZone39" parent="GrowingZones" instance=ExtResource("3_h2yge")]
 position = Vector2(120, 104)
+
+[node name="GrowingZone40" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(120, 120)
+
+[node name="GrowingZone41" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(120, 136)
+
+[node name="GrowingZone42" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(120, 152)
 
 [node name="AnimalPen" type="Node2D" parent="." unique_id=1434817319]
 script = ExtResource("5_pen")
@@ -587,12 +612,19 @@ offset = Vector2(-24, -54)
 
 [node name="DogHouse" type="Sprite2D" parent="AnimalPen"]
 texture_filter = 1
-position = Vector2(114, 142)
+position = Vector2(143, 158)
 texture = ExtResource("h_doghouse")
 centered = false
 offset = Vector2(-11, -20)
 
 [node name="Buildings" type="Node2D" parent="."]
+
+[node name="Barn" parent="Buildings" groups=["barn"] instance=ExtResource("h_building")]
+position = Vector2(72, 62)
+texture = ExtResource("h_barn")
+
+[node name="Sign" parent="Buildings/Barn" index="2"]
+visible = false
 
 [node name="ShopStall" parent="Buildings" instance=ExtResource("h_building")]
 position = Vector2(316, 80)
@@ -657,3 +689,4 @@ zoom = Vector2(3, 3)
 [node name="ShopScreen" parent="." instance=ExtResource("h_shop_screen")]
 
 [connection signal="activated" from="Buildings/ShopStall" to="ShopScreen" method="open"]
+[connection signal="activated" from="Buildings/Barn" to="HUD" method="open_inventory"]
