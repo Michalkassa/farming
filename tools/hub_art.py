@@ -264,6 +264,28 @@ def coop(k=1.5):
     return c
 
 
+def doghouse():
+    """22x20 dog house with a pitched red roof and an arched door;
+    its bottom edge stands on the ground."""
+    c = Canvas(22, 20)
+    # Plank walls.
+    c.rect(3, 9, 18, 18, WOOD)
+    for x in range(3, 19, 4):
+        c.rect(x, 9, x, 18, WOOD_DK)
+    c.rect(3, 18, 18, 18, WOOD_DK)
+    # Arched doorway.
+    c.rect(8, 12, 13, 18, (44, 28, 18))
+    c.rect(9, 11, 12, 11, (44, 28, 18))
+    # Roof: overhanging gable.
+    for y in range(1, 10):
+        half = 2 + y
+        c.rect(11 - half, y, 10 + half, y, RED if y % 3 else RED_DK)
+    c.rect(0, 9, 21, 9, RED_DK)
+    c.rect(9, 0, 12, 0, RED_DK)
+    c.outline()
+    return c
+
+
 # --- Ground tiles -------------------------------------------------------------
 
 TILE = 16                      # every ground tile matches the 16px grass and fences
@@ -329,6 +351,7 @@ def path_sand():
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     coop().save("coop.png")
+    doghouse().save("doghouse.png")
     tiles = ROOT / "static/tilesets"
     for tilled in (False, True):
         for wet in (False, True):

@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" path="res://ui/shop_screen.tscn" id="h_shop_screen"]
 [ext_resource type="Texture2D" path="res://static/shop/hub_stall.png" id="h_stall"]
 [ext_resource type="Texture2D" path="res://static/shop/coop.png" id="h_coop"]
+[ext_resource type="Texture2D" path="res://static/shop/doghouse.png" id="h_doghouse"]
 [ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Buildings/Pre-made/premade-buildings_free.png" id="h_buildings"]
 [ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Enviroment/Trees/Trees_free.png" id="h_trees"]
 [ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Enviroment/Decor/Natural_Decor_free.png" id="h_decor"]
@@ -84,6 +85,10 @@ region = Rect2(104, 15, 64, 68)
 [sub_resource type="AtlasTexture" id="Atlas_tree"]
 atlas = ExtResource("h_trees")
 region = Rect2(70, 24, 36, 56)
+
+[sub_resource type="AtlasTexture" id="Atlas_bloom_tree"]
+atlas = ExtResource("h_trees")
+region = Rect2(150, 24, 36, 56)
 
 [sub_resource type="AtlasTexture" id="Atlas_grass"]
 atlas = ExtResource("h_decor")
@@ -580,6 +585,13 @@ texture = ExtResource("h_coop")
 centered = false
 offset = Vector2(-24, -54)
 
+[node name="DogHouse" type="Sprite2D" parent="AnimalPen"]
+texture_filter = 1
+position = Vector2(114, 142)
+texture = ExtResource("h_doghouse")
+centered = false
+offset = Vector2(-11, -20)
+
 [node name="Buildings" type="Node2D" parent="."]
 
 [node name="ShopStall" parent="Buildings" instance=ExtResource("h_building")]
@@ -601,6 +613,38 @@ locked_message = "Coming soon!"
 position = Vector2(0, -30)
 text = "WINERY"
 subtitle = "coming soon"
+
+[node name="Trees" type="Node2D" parent="."]
+
+[node name="Tree1" type="Sprite2D" parent="Trees"]
+texture_filter = 1
+position = Vector2(-30, -18)
+texture = SubResource("Atlas_tree")
+centered = false
+
+[node name="Tree2" type="Sprite2D" parent="Trees"]
+texture_filter = 1
+position = Vector2(-19, 40)
+texture = SubResource("Atlas_bloom_tree")
+centered = false
+
+[node name="Tree3" type="Sprite2D" parent="Trees"]
+texture_filter = 1
+position = Vector2(-27, 113)
+texture = SubResource("Atlas_tree")
+centered = false
+
+[node name="Tree4" type="Sprite2D" parent="Trees"]
+texture_filter = 1
+position = Vector2(127, -22)
+texture = SubResource("Atlas_bloom_tree")
+centered = false
+
+[node name="Tree5" type="Sprite2D" parent="Trees"]
+texture_filter = 1
+position = Vector2(351, -27)
+texture = SubResource("Atlas_tree")
+centered = false
 
 [node name="CameraHolder" type="Node2D" parent="." unique_id=1434817320]
 
