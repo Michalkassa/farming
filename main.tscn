@@ -117,104 +117,112 @@ layer_0/tile_data = PackedInt32Array(10, 196608, 1, 65546, 196608, 1, 196618, 19
 [node name="GrowingZones" type="Node2D" parent="." unique_id=919345773]
 
 [node name="GrowingZone" parent="GrowingZones" unique_id=69069094 instance=ExtResource("3_h2yge")]
-position = Vector2(28, 28)
-scale = Vector2(1.5, 1.5)
+position = Vector2(26, 26)
 
 [node name="GrowingZone2" parent="GrowingZones" unique_id=904006210 instance=ExtResource("3_h2yge")]
-position = Vector2(52, 28)
-scale = Vector2(1.5, 1.5)
+position = Vector2(46, 26)
 
 [node name="GrowingZone3" parent="GrowingZones" unique_id=231100037 instance=ExtResource("3_h2yge")]
-position = Vector2(76, 28)
-scale = Vector2(1.5, 1.5)
+position = Vector2(66, 26)
 
 [node name="GrowingZone4" parent="GrowingZones" unique_id=1724626251 instance=ExtResource("3_h2yge")]
-position = Vector2(100, 28)
-scale = Vector2(1.5, 1.5)
+position = Vector2(86, 26)
 
 [node name="GrowingZone5" parent="GrowingZones" unique_id=918303250 instance=ExtResource("3_h2yge")]
-position = Vector2(124, 28)
-scale = Vector2(1.5, 1.5)
+position = Vector2(106, 26)
 
 [node name="GrowingZone6" parent="GrowingZones" unique_id=1321370529 instance=ExtResource("3_h2yge")]
-position = Vector2(28, 52)
-scale = Vector2(1.5, 1.5)
+position = Vector2(126, 26)
 
 [node name="GrowingZone7" parent="GrowingZones" unique_id=1052461194 instance=ExtResource("3_h2yge")]
-position = Vector2(52, 52)
-scale = Vector2(1.5, 1.5)
+position = Vector2(26, 46)
 
 [node name="GrowingZone8" parent="GrowingZones" unique_id=127145404 instance=ExtResource("3_h2yge")]
-position = Vector2(76, 52)
-scale = Vector2(1.5, 1.5)
+position = Vector2(46, 46)
 
 [node name="GrowingZone9" parent="GrowingZones" unique_id=530876526 instance=ExtResource("3_h2yge")]
-position = Vector2(100, 52)
-scale = Vector2(1.5, 1.5)
+position = Vector2(66, 46)
 
 [node name="GrowingZone10" parent="GrowingZones" unique_id=2138852720 instance=ExtResource("3_h2yge")]
-position = Vector2(124, 52)
-scale = Vector2(1.5, 1.5)
+position = Vector2(86, 46)
 
 [node name="GrowingZone11" parent="GrowingZones" unique_id=419151079 instance=ExtResource("3_h2yge")]
-position = Vector2(28, 76)
-scale = Vector2(1.5, 1.5)
+position = Vector2(106, 46)
 
 [node name="GrowingZone12" parent="GrowingZones" unique_id=540370846 instance=ExtResource("3_h2yge")]
-position = Vector2(52, 76)
-scale = Vector2(1.5, 1.5)
+position = Vector2(126, 46)
 
 [node name="GrowingZone13" parent="GrowingZones" unique_id=582581564 instance=ExtResource("3_h2yge")]
-position = Vector2(76, 76)
-scale = Vector2(1.5, 1.5)
+position = Vector2(26, 66)
 
 [node name="GrowingZone14" parent="GrowingZones" unique_id=1362293937 instance=ExtResource("3_h2yge")]
-position = Vector2(100, 76)
-scale = Vector2(1.5, 1.5)
+position = Vector2(46, 66)
 
 [node name="GrowingZone15" parent="GrowingZones" unique_id=1850645380 instance=ExtResource("3_h2yge")]
-position = Vector2(124, 76)
-scale = Vector2(1.5, 1.5)
+position = Vector2(66, 66)
 
 [node name="GrowingZone16" parent="GrowingZones" unique_id=792598032 instance=ExtResource("3_h2yge")]
-position = Vector2(28, 100)
-scale = Vector2(1.5, 1.5)
+position = Vector2(86, 66)
 
 [node name="GrowingZone17" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(52, 100)
-scale = Vector2(1.5, 1.5)
+position = Vector2(106, 66)
 
 [node name="GrowingZone18" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(76, 100)
-scale = Vector2(1.5, 1.5)
+position = Vector2(126, 66)
 
 [node name="GrowingZone19" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(100, 100)
-scale = Vector2(1.5, 1.5)
+position = Vector2(26, 86)
 
 [node name="GrowingZone20" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(124, 100)
-scale = Vector2(1.5, 1.5)
+position = Vector2(46, 86)
 
 [node name="GrowingZone21" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(28, 124)
-scale = Vector2(1.5, 1.5)
+position = Vector2(66, 86)
 
 [node name="GrowingZone22" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(52, 124)
-scale = Vector2(1.5, 1.5)
+position = Vector2(86, 86)
 
 [node name="GrowingZone23" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(76, 124)
-scale = Vector2(1.5, 1.5)
+position = Vector2(106, 86)
 
 [node name="GrowingZone24" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(100, 124)
-scale = Vector2(1.5, 1.5)
+position = Vector2(126, 86)
 
 [node name="GrowingZone25" parent="GrowingZones" instance=ExtResource("3_h2yge")]
-position = Vector2(124, 124)
-scale = Vector2(1.5, 1.5)
+position = Vector2(26, 106)
+
+[node name="GrowingZone26" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(46, 106)
+
+[node name="GrowingZone27" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(66, 106)
+
+[node name="GrowingZone28" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(86, 106)
+
+[node name="GrowingZone29" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(106, 106)
+
+[node name="GrowingZone30" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(126, 106)
+
+[node name="GrowingZone31" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(26, 126)
+
+[node name="GrowingZone32" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(46, 126)
+
+[node name="GrowingZone33" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(66, 126)
+
+[node name="GrowingZone34" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(86, 126)
+
+[node name="GrowingZone35" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(106, 126)
+
+[node name="GrowingZone36" parent="GrowingZones" instance=ExtResource("3_h2yge")]
+position = Vector2(126, 126)
 
 [node name="AnimalPen" type="Node2D" parent="." unique_id=1434817319]
 script = ExtResource("5_pen")
@@ -223,11 +231,10 @@ kinds = Array[ExtResource("7_animal_kind")]([ExtResource("kind_0"), ExtResource(
 
 [node name="ChickenCoop" type="Sprite2D" parent="AnimalPen"]
 texture_filter = 1
-position = Vector2(224, 24)
-scale = Vector2(2, 2)
+position = Vector2(224, 26)
 texture = ExtResource("h_coop")
 centered = false
-offset = Vector2(-16, -36)
+offset = Vector2(-24, -54)
 
 [node name="Decor" type="Node2D" parent="."]
 

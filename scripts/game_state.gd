@@ -33,7 +33,7 @@ const SAVE_VERSION := 1
 
 @export_group("Farm")
 ## Distance between neighbouring plots, used to find a tool's area of effect.
-@export var zone_spacing: float = 24.0
+@export var zone_spacing: float = 20.0
 
 @export_group("Saving")
 @export var autosave_seconds: float = 3.0

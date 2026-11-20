@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cs7e0qbradn18"
-path="res://.godot/imported/soil_ready_dry.png-6545fd9f39ebbd0bd0dea13eab1e40b5.ctex"
+uid="uid://drsm4h62arvyq"
+path="res://.godot/imported/bed_bare_wet.png-a1284989e62f0df16a10588a2e673802.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://static/tilesets/soil_ready_dry.png"
-dest_files=["res://.godot/imported/soil_ready_dry.png-6545fd9f39ebbd0bd0dea13eab1e40b5.ctex"]
+source_file="res://static/tilesets/bed_bare_wet.png"
+dest_files=["res://.godot/imported/bed_bare_wet.png-a1284989e62f0df16a10588a2e673802.ctex"]
 
 [params]
 

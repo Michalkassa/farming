@@ -209,42 +209,121 @@ def hub_stall():
     return c
 
 
-def coop():
-    """32x36 chicken coop on stilts; its bottom edge stands on the fence line."""
-    c = Canvas(32, 36)
+class Scaled:
+    """Draws on a Canvas in coordinates of a smaller design, scaled by k, so
+    the art can be redrawn larger with crisp 1px outlines instead of being
+    stretched."""
+    def __init__(self, canvas, k):
+        self.c, self.k = canvas, k
+
+    def _a(self, v):
+        return int(round(v * self.k))
+
+    def rect(self, x0, y0, x1, y1, col):
+        self.c.rect(self._a(x0), self._a(y0), self._a(x1 + 1) - 1, self._a(y1 + 1) - 1, col)
+
+    def put(self, x, y, col):
+        self.rect(x, y, x, y, col)
+
+
+def coop(k=1.5):
+    """Chicken coop on stilts, designed on a 32x36 grid and drawn at k times
+    that size; its bottom edge stands on the ground."""
+    c = Canvas(int(32 * k), int(36 * k))
+    d = Scaled(c, k)
     # Stilts and the ramp down into the run.
-    c.rect(6, 26, 7, 35, WOOD_DK); c.rect(24, 26, 25, 35, WOOD_DK)
+    d.rect(6, 26, 7, 35, WOOD_DK); d.rect(24, 26, 25, 35, WOOD_DK)
     for i in range(9):
-        c.rect(13 + i // 3, 27 + i, 18 + i // 3, 27 + i, WOOD_LT if i % 2 else WOOD)
+        d.rect(13 + i // 3, 27 + i, 18 + i // 3, 27 + i, WOOD_LT if i % 2 else WOOD)
     # Body: plank walls.
-    c.rect(4, 14, 27, 26, WOOD)
+    d.rect(4, 14, 27, 26, WOOD)
     for x in range(4, 28, 4):
-        c.rect(x, 14, x, 26, WOOD_DK)
-    c.rect(4, 26, 27, 26, WOOD_DK)
+        d.rect(x, 14, x, 26, WOOD_DK)
+    d.rect(4, 26, 27, 26, WOOD_DK)
     # Round-topped door with straw inside, and a little window.
-    c.rect(13, 19, 18, 26, (60, 38, 22))
-    c.rect(14, 18, 17, 18, (60, 38, 22))
-    c.rect(14, 24, 17, 25, STRAW)
-    c.put(13, 25, STRAW_LT); c.put(18, 24, STRAW)
-    c.rect(22, 17, 25, 20, (120, 190, 220))
-    c.rect(22, 17, 25, 17, WHITE)
-    c.put(23, 19, (90, 150, 190))
-    # Pitched red roof with an overhang and a ridge.
-    for y in range(3, 15):
-        half = 3 + (y - 3) * 13 // 11
-        c.rect(16 - half, y, 15 + half, y, RED if y % 3 else RED_DK)
-    c.rect(1, 14, 30, 14, RED_DK)
-    c.rect(14, 2, 17, 2, RED_DK)
+    d.rect(13, 19, 18, 26, (60, 38, 22))
+    d.rect(14, 18, 17, 18, (60, 38, 22))
+    d.rect(14, 24, 17, 25, STRAW)
+    d.put(13, 25, STRAW_LT); d.put(18, 24, STRAW)
+    d.rect(22, 17, 25, 20, (120, 190, 220))
+    d.rect(22, 17, 25, 17, WHITE)
+    d.put(23, 19, (90, 150, 190))
+    # Pitched red roof drawn per output row so the slope stays smooth.
+    top, bottom = int(round(3 * k)), int(round(15 * k)) - 1
+    for y in range(top, bottom + 1):
+        t = (y - top) / max(1, bottom - top)
+        half = int(round((3 + t * 13) * k))
+        stripe = ((y - top) // max(1, int(round(3 * k)))) % 2
+        c.rect(int(16 * k) - half, y, int(16 * k) + half - 1, y, RED_DK if stripe else RED)
+    d.rect(1, 14, 30, 14, RED_DK)
+    d.rect(14, 2, 17, 2, RED_DK)
     # Tiny egg sign over the door.
-    c.rect(14, 15, 17, 16, CREAM)
-    c.put(15, 15, (240, 220, 180))
+    d.rect(14, 15, 17, 16, CREAM)
+    d.put(15, 15, (240, 220, 180))
     c.outline()
+    return c
+
+
+# --- Raised beds -------------------------------------------------------------
+
+BED = 20                       # one plot, in world pixels
+SOIL = {
+    "dry": ((156, 90, 60), (124, 72, 48), (177, 102, 68)),
+    "wet": ((80, 48, 34), (64, 38, 27), (91, 54, 38)),
+}
+FURROW = {
+    "dry": ((188, 122, 82), (106, 63, 42)),
+    "wet": ((104, 64, 46), (52, 31, 22)),
+}
+
+
+def raised_bed(wet=False, tilled=False):
+    """20x20 plot: a wooden raised bed seen from above and slightly in front,
+    so the top rim and the front board give it depth."""
+    c = Canvas(BED, BED)
+    base, dark, light = SOIL["wet" if wet else "dry"]
+    face = BED - 5             # rows 0..14 are the top, 15..18 the front board
+    # Wooden rim around the top face.
+    c.rect(0, 0, BED - 1, face, WOOD)
+    c.rect(1, 0, BED - 2, 0, WOOD_LT)
+    c.rect(0, 1, 0, face - 1, WOOD_LT)
+    c.rect(BED - 1, 1, BED - 1, face - 1, WOOD_DK)
+    # Soil, sunk inside the rim: darker top edge reads as the inner wall.
+    c.rect(2, 2, BED - 3, face - 2, base)
+    c.rect(2, 2, BED - 3, 2, dark)
+    c.rect(2, 2, 2, face - 2, dark)
+    if tilled:
+        hi, lo = FURROW["wet" if wet else "dry"]
+        for y in (5, 9, 12):
+            c.rect(4, y - 1, BED - 5, y - 1, hi)
+            c.rect(4, y, BED - 5, y, lo)
+    else:
+        for x, y in ((5, 5), (12, 4), (8, 9), (15, 10), (4, 11), (11, 12), (14, 6)):
+            c.put(x, y, light if (x + y) % 2 else dark)
+    # Front board: the side of the bed facing the camera.
+    c.rect(0, face + 1, BED - 1, BED - 2, WOOD_DK)
+    c.rect(0, face + 1, BED - 1, face + 1, WOOD)
+    for x in (4, 10, 15):
+        c.put(x, face + 2, (90, 54, 28))
+    # Outline: top and sides, then the ground line under the board.
+    c.rect(0, 0, BED - 1, 0, OUTLINE)
+    c.rect(0, 0, 0, BED - 2, OUTLINE)
+    c.rect(BED - 1, 0, BED - 1, BED - 2, OUTLINE)
+    c.rect(0, BED - 1, BED - 1, BED - 1, OUTLINE)
+    c.rect(1, face, BED - 2, face, OUTLINE)
     return c
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     coop().save("coop.png")
+    beds = ROOT / "static/tilesets"
+    for tilled in (False, True):
+        for wet in (False, True):
+            name = f"bed_{'tilled' if tilled else 'bare'}_{'wet' if wet else 'dry'}.png"
+            im = raised_bed(wet, tilled)
+            im.save(name)
+            (OUT / name).replace(beds / name)
     awning().save("awning.png")
     planks(WOOD, WOOD_DK, WOOD_LT, "counter_front.png")
     planks(BACK, BACK_DK, BACK_LT, "back_wall.png")

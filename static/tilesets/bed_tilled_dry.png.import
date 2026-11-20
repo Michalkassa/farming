@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://8qtdvqai2pgi"
-path="res://.godot/imported/soil_notready_wet.png-5e506f5687c01519f7aac71b0ae1ea2b.ctex"
+uid="uid://168cvt2p6rqs"
+path="res://.godot/imported/bed_tilled_dry.png-94a2913eae98d652f47170a2d7f28bde.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://static/tilesets/soil_notready_wet.png"
-dest_files=["res://.godot/imported/soil_notready_wet.png-5e506f5687c01519f7aac71b0ae1ea2b.ctex"]
+source_file="res://static/tilesets/bed_tilled_dry.png"
+dest_files=["res://.godot/imported/bed_tilled_dry.png-94a2913eae98d652f47170a2d7f28bde.ctex"]
 
 [params]
 
