@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Generates the crop sprites: growing stages, ripe plants, harvested-item icons
-and seed bags. Run from the project root; writes into static/crops and static/items.
+and seed bags. Writes into static/crops and static/items.
+
+By default only the seed bags are written; pass --all to also regenerate the
+crop sprites (the ones on disk have hand touch-ups this script doesn't know).
 
 Every sprite is a 16x16 grid drawn with fills, then given a dark 1px outline
 where a filled pixel touches a transparent one, which keeps the set cohesive."""
@@ -275,14 +278,60 @@ BAG = """\
 ...aaaaaaaaaa..."""
 BAG_PAL = {"a": (25, 30, 60), "b": (191, 151, 52), "c": (255, 206, 71), "d": (225, 178, 61),
            "e": (146, 116, 40), "k": (105, 83, 28)}
-GLYPHS = {  # 6x6 emblems stamped on the bag label
-    "wheat": "..Y...\n.YYY..\n.YYY.y\n..y.yy\n..y.y.\n..y.y.",
-    "carrot": "..GG..\n.GhG..\n..CC..\n..CC..\n..C...\n..C...",
-    "corn": "..GG..\n.YwY..\n.wYw..\n.YwY.G\n.wYwG.\n..GG..",
-    "tomato": "..g...\n.GGG..\n.RpR..\nRRRRR.\n.RRR..\n..r...",
-    "strawberry": ".GGG..\n.RpR..\nRRwRR.\nRwRRR.\n.RRw..\n..R...",
-    "watermelon": "......\nmmmmmm\nRRkRRm\n.RkRm.\n..Rm..\n......",
+# 8x8 crop pictures for the bag front. Each gets a white border and a thin
+# dark edge, like a sticker, so the crop reads clearly even at small sizes.
+GLYPHS = {
+    "wheat": ("..Y..Y..\n"
+              ".YwYYwY.\n"
+              ".YYYYYY.\n"
+              "..YwYY..\n"
+              "...yy...\n"
+              "...yy...\n"
+              "..yyyy..\n"
+              "........"),
+    "carrot": ("..G.G...\n"
+               "...GhG..\n"
+               "..CCCC..\n"
+               "..lCCC..\n"
+               "..CCCc..\n"
+               "...CCc..\n"
+               "...Cc...\n"
+               "....c..."),
+    "corn": ("...GG...\n"
+             "..YwYG..\n"
+             "..wYwG..\n"
+             "..YwYG..\n"
+             ".GwYwG..\n"
+             ".GYwYG..\n"
+             "..GGG...\n"
+             "...g...."),
+    "tomato": ("...gg...\n"
+               "..GGGG..\n"
+               ".RRpRRR.\n"
+               ".RpRRRR.\n"
+               ".RRRRRR.\n"
+               ".RRRRRr.\n"
+               "..RRRr..\n"
+               "...rr..."),
+    "strawberry": (".GGGGG..\n"
+                   "..GhG...\n"
+                   ".RRpRR..\n"
+                   ".RwRRwR.\n"
+                   ".RRRwRR.\n"
+                   "..RwRR..\n"
+                   "..RRR...\n"
+                   "...R...."),
+    "watermelon": ("pRRRRRRp\n"
+                   "RRkRRkRR\n"
+                   "mRRRRRRm\n"
+                   ".mRkRRm.\n"
+                   ".dmRRmd.\n"
+                   "..dmmd..\n"
+                   "...dd...\n"
+                   "........"),
 }
+GLYPH_AT = (4, 5)              # top-left of the 8x8 picture on the bag
+STICKER_WHITE = (255, 255, 255)
 
 def seed_bag(crop):
     im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
@@ -290,10 +339,28 @@ def seed_bag(crop):
         for x, ch in enumerate(row):
             if ch != ".":
                 im.putpixel((x, y), BAG_PAL[ch] + (255,))
+    glyph = {}
     for dy, row in enumerate(GLYPHS[crop].split("\n")):
         for dx, ch in enumerate(row):
             if ch != ".":
-                im.putpixel((5 + dx, 7 + dy), PAL[ch] + (255,))
+                glyph[(GLYPH_AT[0] + dx, GLYPH_AT[1] + dy)] = PAL[ch]
+    # Two rings around the picture: white, then the dark outline colour.
+    def ring(shape):
+        out = set()
+        for (x, y) in shape:
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                q = (x + dx, y + dy)
+                if q not in shape and 0 <= q[0] < 16 and 0 <= q[1] < 16:
+                    out.add(q)
+        return out
+    white = ring(set(glyph))
+    dark = ring(set(glyph) | white)
+    for q in dark:
+        im.putpixel(q, PAL["o"] + (255,))
+    for q in white:
+        im.putpixel(q, STICKER_WHITE + (255,))
+    for q, col in glyph.items():
+        im.putpixel(q, col + (255,))
     return im
 
 CROPS = {
@@ -304,6 +371,11 @@ CROPS = {
     "strawberry": (strawberry_young, strawberry_grown, strawberry_ripe, strawberry_item),
     "watermelon": (watermelon_young, watermelon_grown, watermelon_ripe, watermelon_item),
 }
+
+def seed_bags(root: Path):
+    for name in CROPS:
+        seed_bag(name).save(root / "static/items" / f"{name}_seeds.png")
+    print("wrote", len(CROPS), "seed bags")
 
 def main(root: Path):
     crops, items = root / "static/crops", root / "static/items"
@@ -318,4 +390,7 @@ def main(root: Path):
     print("wrote", 2 + len(CROPS) * 5, "sprites")
 
 if __name__ == "__main__":
-    main(Path(__file__).resolve().parent.parent)
+    import sys
+    root = Path(__file__).resolve().parent.parent
+    # `--all` also rewrites the crop sprites, which have hand edits on disk.
+    main(root) if "--all" in sys.argv else seed_bags(root)
