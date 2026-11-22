@@ -35,6 +35,13 @@ const SAVE_VERSION := 1
 ## Distance between neighbouring plots, used to find a tool's area of effect.
 @export var zone_spacing: float = 16.0
 
+@export_group("Codes")
+## Codes the player can type into Settings, each usable once per save.
+## "money_for" grants exactly the buy price of that item.
+@export var codes: Dictionary = {
+	"astoria": {"money_for": "dog"},
+}
+
 @export_group("Saving")
 @export var autosave_seconds: float = 3.0
 
@@ -45,6 +52,7 @@ var sell_grid: Array = []
 var selected_hotbar: int = 0
 var cursor: ItemStack = null
 var animals: Array = []
+var redeemed_codes: Array = []
 
 var _zones: Array = []
 var _zone_states: Dictionary = {}
@@ -298,9 +306,9 @@ func buy_block_reason(item_id: StringName) -> StringName:
 	if not can_afford(item.buy_price):
 		return &"money"
 	if item.is_tool():
-		if tool_area_owned(item.tool_kind) == 0 and not has_space_for(item_id):
+		if tool_area_owned(item.tool_kind) == 0 and not can_collect(item_id):
 			return &"pack_full"
-	elif not item.is_animal() and not has_space_for(item_id):
+	elif not item.is_animal() and not can_collect(item_id):
 		return &"pack_full"
 	return &""
 
@@ -319,11 +327,18 @@ func buy(item_id: StringName) -> bool:
 		return true
 	if item.is_tool():
 		return _buy_tool(item)
-	if not has_space_for(item_id):
+	if not can_collect(item_id):
 		return false
 	set_money(money - item.buy_price)
-	add_item(item_id, 1)
+	_add_bought(item_id, 1)
 	return true
+
+## Bought things go straight to the hotbar (topping up a matching stack or
+## taking a free slot) and only spill into the backpack when the hand is full.
+func _add_bought(item_id: StringName, count: int) -> void:
+	var leftover := add_item(item_id, count, "hotbar")
+	if leftover > 0:
+		add_item(item_id, leftover, "inventory")
 
 ## The largest area any owned tool of this kind covers (0 when none is owned).
 func tool_area_owned(kind: StringName) -> int:
@@ -356,14 +371,14 @@ func _buy_tool(item: ItemData) -> bool:
 				break
 		if old_index >= 0:
 			break
-	if old_index < 0 and not has_space_for(item.id):
+	if old_index < 0 and not can_collect(item.id):
 		return false
 	set_money(money - item.buy_price)
 	if old_index >= 0:
 		container(old_cont)[old_index] = ItemStack.new(item.id, 1)
 		_emit_changed(old_cont)
 	else:
-		add_item(item.id, 1)
+		_add_bought(item.id, 1)
 	tools_changed.emit()
 	return true
 
@@ -453,6 +468,26 @@ func sell_item(item_id: StringName, count: int) -> int:
 	set_money(money + earned)
 	return earned
 
+## Tries a code from the settings menu. Returns {ok, message}.
+func redeem_code(raw: String) -> Dictionary:
+	var code := raw.strip_edges().to_lower()
+	if code == "" or not codes.has(code):
+		return {"ok": false, "message": "Unknown code"}
+	if redeemed_codes.has(code):
+		return {"ok": false, "message": "Already used on this farm"}
+	var reward: Dictionary = codes[code]
+	var amount := 0
+	if reward.has("money_for"):
+		var item: ItemData = ItemDatabase.get_item(StringName(reward["money_for"]))
+		amount = item.buy_price if item else 0
+	amount += int(reward.get("money", 0))
+	if amount <= 0:
+		return {"ok": false, "message": "Unknown code"}
+	redeemed_codes.append(code)
+	add_money(amount)
+	save_game()
+	return {"ok": true, "message": "Code redeemed! +€%d" % amount}
+
 func sell_all_staged() -> int:
 	var total := 0
 	for i in sell_grid.size():
@@ -541,6 +576,7 @@ func reset_progress() -> void:
 			zone.reset_zone()
 	cursor = null
 	animals.clear()
+	redeemed_codes.clear()
 	for i in inventory.size():
 		inventory[i] = null
 	for i in hotbar.size():
@@ -573,6 +609,7 @@ func save_data() -> Dictionary:
 		"hotbar": _pack_container(hotbar),
 		"sell": _pack_container(sell_grid),
 		"animals": _pack_animals(),
+		"codes": redeemed_codes.duplicate(),
 		"zones": _zone_states,
 	}
 
@@ -601,6 +638,12 @@ func _load_game() -> bool:
 			var kind := StringName(entry)
 			if ItemDatabase.get_item(kind) != null and can_buy_animal(kind):
 				animals.append(kind)
+
+	redeemed_codes.clear()
+	var saved_codes: Variant = data.get("codes", [])
+	if typeof(saved_codes) == TYPE_ARRAY:
+		for c in saved_codes:
+			redeemed_codes.append(String(c))
 
 	# Zones live in the main scene, so they pick this up when they register.
 	var saved_zones: Variant = data.get("zones", {})

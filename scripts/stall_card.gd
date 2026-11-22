@@ -8,15 +8,18 @@ signal sell_pressed(card: StallCard, count: int)
 
 @export var price_format: String = "€%d"
 @export var each_format: String = "€%d each"
-@export var carry_format: String = "You have %d"
+@export var carry_format: String = "×%d"
 @export var sell_all_format: String = "All €%d"
 @export var sell_one_text: String = "1"
 @export var owned_text: String = "Owned"
 @export var full_text: String = "Full"
-@export var animal_count_format: String = "%d/%d in pen"
-@export var tool_area_format: String = "%d×%d plots"
+@export var animal_count_format: String = "%d/%d"
+@export var tool_area_format: String = "%d×%d"
 @export var affordable_variation: StringName = &"AccentButton"
 @export var sell_variation: StringName = &"GoldButton"
+## The tallest the icon may be; it's drawn at the largest whole-number
+## scale of its art that fits, so pixels stay even.
+@export var max_icon_height: int = 88
 
 @onready var _icon: TextureRect = %CardIcon
 @onready var _name_label: Label = %CardName
@@ -55,6 +58,7 @@ func refresh() -> void:
 		var have := GameState.count_owned(item.id)
 		_info_label.text = carry_format % have
 		_info_label.visible = true
+		_fit_icon()
 		_main_button.text = sell_all_format % (have * item.sell_price)
 		_main_button.theme_type_variation = sell_variation
 		_main_button.disabled = have <= 0
@@ -69,6 +73,7 @@ func refresh() -> void:
 	elif item.is_tool():
 		_info_label.text = tool_area_format % [item.tool_area, item.tool_area]
 	_info_label.visible = _info_label.text != ""
+	_fit_icon()
 	var reason := GameState.buy_block_reason(item.id)
 	match reason:
 		&"owned":
@@ -83,6 +88,11 @@ func refresh() -> void:
 	# Still clickable when you can't afford it, so the farmer can tell you so;
 	# the plain brown button says "not yet" at a glance.
 	_main_button.theme_type_variation = affordable_variation if reason == &"" else &""
+
+func _fit_icon() -> void:
+	var art := item.icon.get_size() if item.icon else Vector2(16, 16)
+	var scale := maxi(1, floori(max_icon_height / maxf(art.y, 1.0)))
+	_icon.custom_minimum_size = Vector2(0, art.y * scale)
 
 ## A little hop when something is bought or sold, or a shake when it can't be.
 func bump(ok: bool = true) -> void:

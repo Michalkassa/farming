@@ -529,6 +529,19 @@ def path_sand():
     return c
 
 
+def shop_icon(src, dst):
+    """A shop icon from an animal sprite: drops the soft drop-shadow (any
+    semi-transparent pixel) and crops to the animal so it can be drawn big."""
+    im = Image.open(src).convert("RGBA")
+    solid = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    for y in range(im.height):
+        for x in range(im.width):
+            px = im.getpixel((x, y))
+            if px[3] == 255:
+                solid.putpixel((x, y), px)
+    solid.crop(solid.getbbox()).save(dst)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     coop().save("coop.png")
@@ -537,6 +550,7 @@ def main():
     barn_frame(); crate_slot(); hay_bale()
     barn_wall(); straw_floor(); beam(); lantern()
     settings_cog()
+    shop_icon(ROOT / "static/animals/pig_walk_0.png", ROOT / "static/items/pig_icon.png")
     tiles = ROOT / "static/tilesets"
     for tilled in (False, True):
         for wet in (False, True):

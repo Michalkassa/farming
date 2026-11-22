@@ -34,6 +34,8 @@ extends CanvasLayer
 
 @export_group("Settings")
 @export var settings_hover_tint: Color = Color(1.2, 1.15, 1.05)
+@export var code_ok_color: Color = Color(0.55, 0.95, 0.45)
+@export var code_bad_color: Color = Color(1, 0.55, 0.45)
 
 @export_group("Barn Interior")
 ## Size the barn backdrop is designed at; it's scaled to cover the window.
@@ -61,6 +63,9 @@ extends CanvasLayer
 @onready var _settings_button: TextureButton = %SettingsButton
 @onready var _settings_screen: Control = %SettingsScreen
 @onready var _settings_close: Button = %SettingsClose
+@onready var _code_input: LineEdit = %CodeInput
+@onready var _code_redeem: Button = %CodeRedeem
+@onready var _code_result: Label = %CodeResult
 @onready var _cursor_icon: TextureRect = %CursorIcon
 @onready var _cursor_count: Label = %CursorCount
 
@@ -85,6 +90,8 @@ func _ready() -> void:
 	_reset_button.pressed.connect(_on_reset_pressed)
 	_settings_button.pressed.connect(_set_settings_open.bind(true))
 	_settings_close.pressed.connect(_set_settings_open.bind(false))
+	_code_redeem.pressed.connect(_on_code_entered)
+	_code_input.text_submitted.connect(func(_t): _on_code_entered())
 	_settings_button.mouse_entered.connect(func(): _settings_button.modulate = settings_hover_tint)
 	_settings_button.mouse_exited.connect(func(): _settings_button.modulate = Color.WHITE)
 	_disarm_reset()
@@ -286,7 +293,17 @@ func _fit_inventory_screen() -> void:
 func _set_settings_open(open: bool) -> void:
 	if not open:
 		_disarm_reset()
+		_code_input.release_focus()
+	_code_input.text = ""
+	_code_result.text = ""
 	_settings_screen.visible = open
+
+func _on_code_entered() -> void:
+	var result: Dictionary = GameState.redeem_code(_code_input.text)
+	_code_result.text = result["message"]
+	_code_result.add_theme_color_override("font_color", code_ok_color if result["ok"] else code_bad_color)
+	if result["ok"]:
+		_code_input.text = ""
 
 ## Opens the barn storage window; the barn building in the hub calls this.
 func open_inventory() -> void:
