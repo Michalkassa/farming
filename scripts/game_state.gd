@@ -620,6 +620,7 @@ func reset_progress() -> void:
 	animals.clear()
 	redeemed_codes.clear()
 	Winery.reset()
+	Orchard.reset()
 	for i in inventory.size():
 		inventory[i] = null
 	for i in hotbar.size():
@@ -655,6 +656,7 @@ func save_data() -> Dictionary:
 		"codes": redeemed_codes.duplicate(),
 		"zones": _zone_states,
 		"winery": Winery.save_state(),
+		"orchard": Orchard.save_state(),
 	}
 
 func _load_game() -> bool:
@@ -673,6 +675,7 @@ func _load_game() -> bool:
 	selected_hotbar = clampi(int(data.get("selected_hotbar", 0)), 0, hotbar_size - 1)
 	# Bottle items are registered at runtime, so they must exist before the bags unpack.
 	Winery.load_state(data.get("winery", {}))
+	Orchard.load_state(data.get("orchard", []))
 	_unpack_container(inventory, data.get("inventory"))
 	_unpack_container(hotbar, data.get("hotbar"))
 	_unpack_container(sell_grid, data.get("sell"))

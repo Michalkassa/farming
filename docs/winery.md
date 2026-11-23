@@ -148,25 +148,35 @@ These outputs come from `Brewing.brew()` in headless Godot, using only items the
 
 ---
 
-## 7. Orchard (separate screen)
+## 7. Orchard (separate screen) ✅
 
-A new screen, reached from the farm the same way the barn interior is. It holds permanent fruit
-plants: plant once, then harvest whenever they ripen. Tomato, Strawberry and Watermelon stay on the
-farm's existing field plots. These are first-pass numbers to tune with `tools/balance_sim.py`.
+The orchard is its own screen (`ui/orchard_screen.gd`, state in the `Orchard` autoload). You reach it from the
+**ORCHARD signpost** between the animal pen and the shop. It's a sunny fenced meadow with a smiling sun, drifting
+clouds, hills, an entrance arch, a shed with a heart window, a beehive with buzzing bees, a pond, a fruit-laden
+wheelbarrow, flowers, mushrooms and butterflies. Plants sway, and fruiting plants sparkle.
 
-| Plant | Fruits | Sapling | Fruits every | Yield |
-|---|---|---|---|---|
-| Vine (trellis) | Grape · Passionfruit · Dragonfruit | 300 · 900 · 4 000 | 90 s · 90 s · 120 s | 3 · 3 · 2 |
-| Bush | Blueberry · Raspberry · Elderberry · Blackberry · Pineapple | 250 · 400 · 450 · 900 · 1 800 | 60 s (Blackberry 75 s, Pineapple 90 s) | 3 (Pineapple 2) |
-| Tree | Apple · Pear · Orange · Plum · Lemon · Cherry · Fig · Peach | 250 · 280 · 400 · 400 · 550 · 700 · 1 300 · 1 500 | 120 s | 4 |
-| Tree (exotic) | Mango · Pomegranate | 1 600 · 3 500 | 150 s | 4 |
-| Golden Apple tree | Golden Apple | 30 000 | 600 s | 1 |
+- **Three rows of 5 plots:** trees at the back, vines on trellises in the middle, bushes at the front. Each row only takes its own kind.
+- **Click an empty plot** to open the sapling picker and buy a sapling straight into it. Plants are permanent.
+- A plant grows through 3 stages, then fruits. **Click a sparkling plant** to pick everything into your bags (whatever doesn't fit stays on the plant). It then fruits again on its timer.
+- Plants keep growing while you're elsewhere (in-session) and are saved. The dog's growth bonus applies here too.
+- Hover a plant to see how long until it fruits.
+- Tomato, Strawberry and Watermelon stay on the farm's field plots.
+
+| Row | Plant | Sapling | First fruit after | Then every | Yield |
+|---|---|---|---|---|---|
+| Trees | Apple · Pear · Orange · Plum · Lemon · Cherry · Fig · Peach | 250 · 280 · 400 · 400 · 550 · 700 · 1 300 · 1 500 | 90 s | 120 s | 4 |
+| Trees | Mango · Pomegranate | 1 600 · 3 500 | 120 s | 150 s | 4 |
+| Trees | Golden Apple | 30 000 | 300 s | 600 s | 1 |
+| Vines | Grape · Passionfruit · Dragonfruit | 300 · 900 · 4 000 | 60 · 60 · 80 s | 90 · 90 · 120 s | 3 · 3 · 2 |
+| Bushes | Blueberry · Raspberry · Elderberry · Blackberry · Pineapple | 250 · 400 · 450 · 900 · 1 800 | 40 s (Blackberry 50, Pineapple 60) | 60 s (75, 90) | 3 (Pineapple 2) |
+
+The art comes from `tools/orchard_art.py`. Trees reuse the Clover Valley pack's own tree stages, and everything else is drawn in its palette. These are first-pass numbers.
 
 ---
 
 ## 8. Still to build
 
-- **Orchard screen:** scene, plant slots, sapling items in the shop, fruit items and art.
+- ~~**Orchard screen**~~ ✅ built (§7).
 - ~~**Winery screen:** the barrel~~ ✅ built (`ui/winery_screen.gd`, `scripts/winery.gd`): yeast, fruit and extra slots, seal → ferment timer → bottle. Still to do: the stir, airlock and pour minigames.
 - **Items:** ✅ yeasts are in the shop's Wine tab (the only thing it sells), the farm's produce is the additions, and bottles become items. Still to do: drinking them from the hotbar.
 - **`GameState`:** a buff list (effect → level, time left), the hooks from §3 reading from it, and save/load.

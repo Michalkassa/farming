@@ -17,6 +17,8 @@
 [ext_resource type="PackedScene" path="res://hub/hub_building.tscn" id="h_building"]
 [ext_resource type="PackedScene" path="res://ui/shop_screen.tscn" id="h_shop_screen"]
 [ext_resource type="PackedScene" path="res://ui/winery_screen.tscn" id="h_winery_screen"]
+[ext_resource type="PackedScene" path="res://ui/orchard_screen.tscn" id="h_orchard_screen"]
+[ext_resource type="Texture2D" path="res://static/orchard/signpost.png" id="h_signpost"]
 [ext_resource type="Texture2D" path="res://static/shop/hub_stall.png" id="h_stall"]
 [ext_resource type="Texture2D" path="res://static/shop/coop.png" id="h_coop"]
 [ext_resource type="Texture2D" path="res://static/shop/doghouse.png" id="h_doghouse"]
@@ -645,6 +647,15 @@ position = Vector2(0, -30)
 text = "WINERY"
 text_color = Color(0.85, 0.55, 0.95, 1)
 
+[node name="Orchard" parent="Buildings" instance=ExtResource("h_building")]
+position = Vector2(279, 92)
+texture = ExtResource("h_signpost")
+
+[node name="Sign" parent="Buildings/Orchard" index="2"]
+position = Vector2(0, -36)
+text = "ORCHARD"
+text_color = Color(0.6, 1, 0.55, 1)
+
 [node name="Trees" type="Node2D" parent="."]
 
 [node name="Tree1" type="Sprite2D" parent="Trees"]
@@ -689,6 +700,9 @@ zoom = Vector2(3, 3)
 
 [node name="WineryScreen" parent="." instance=ExtResource("h_winery_screen")]
 
+[node name="OrchardScreen" parent="." instance=ExtResource("h_orchard_screen")]
+
 [connection signal="activated" from="Buildings/ShopStall" to="ShopScreen" method="open"]
 [connection signal="activated" from="Buildings/Barn" to="HUD" method="open_inventory"]
 [connection signal="activated" from="Buildings/Winery" to="WineryScreen" method="open"]
+[connection signal="activated" from="Buildings/Orchard" to="OrchardScreen" method="open"]
