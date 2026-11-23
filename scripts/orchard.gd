@@ -5,7 +5,7 @@ extends Node
 ## the middle, bushes at the front. Each row only takes its own kind of plant.
 ## A sapling is bought straight into an empty plot and stays there for good: it
 ## grows up once, then keeps fruiting every so often. Click a fruiting plant to
-## pick everything on it. Plants keep growing while the orchard screen is shut,
+## pick everything on it. The shovel digs a plant back out. Plants keep growing while the orchard screen is shut,
 ## and the plots travel with the save (GameState calls save_state/load_state).
 
 signal plot_changed(index: int)
@@ -107,6 +107,14 @@ func plant(index: int, plant_id: StringName) -> bool:
 		return false
 	GameState.add_money(-price)
 	plots[index] = {"plant": plant_id, "grown": 0.0, "timer": 0.0, "stock": 0}
+	plot_changed.emit(index)
+	return true
+
+## Digs the plant out with the shovel, leaving an empty plot. No refund.
+func dig_up(index: int) -> bool:
+	if index < 0 or index >= plots.size() or plots[index].plant == &"":
+		return false
+	plots[index] = {"plant": &"", "grown": 0.0, "timer": 0.0, "stock": 0}
 	plot_changed.emit(index)
 	return true
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generates the orchard art: fruit item icons, every growth stage of the
 orchard's trees, bushes and vines, and the cute decor for the orchard screen
-(smiling sun, clouds, hills, shed, beehive, bees, butterflies, flowers, fence,
-entrance arch and the hub signpost).
+(clouds, shed, butterflies, flowers, fence, entrance arch and the hub
+signpost), plus the shovel icon.
 
 Trees reuse the Clover Valley pack's own tree stages so the orchard matches the
 farm, with fruit drawn over the full-grown canopy. Everything else is drawn in
@@ -432,26 +432,6 @@ def plants():
 
 
 # ------------------------------------------------------------------ decor
-def sun():
-    p = Px(24, 24)
-    rays = (255, 214, 90)
-    for i, (dx, dy) in enumerate(((0, -11), (8, -8), (11, 0), (8, 8), (0, 11), (-8, 8), (-11, 0), (-8, -8))):
-        p.line(12 + dx * 7 // 11, 12 + dy * 7 // 11, 12 + dx, 12 + dy, rays)
-    p.disc(12, 12, 6.5, (255, 200, 60))
-    p.disc(11, 11, 5, (255, 226, 110))
-    # Sleepy happy face with rosy cheeks.
-    p.put(9, 11, WOOD_D)
-    p.put(10, 11, WOOD_D)
-    p.put(14, 11, WOOD_D)
-    p.put(15, 11, WOOD_D)
-    p.put(11, 14, WOOD_D)
-    p.put(12, 15, WOOD_D)
-    p.put(13, 14, WOOD_D)
-    p.put(8, 13, (255, 140, 140))
-    p.put(16, 13, (255, 140, 140))
-    return p.outline((230, 150, 40))
-
-
 def cloud(variant):
     p = Px(40, 16) if variant == 0 else Px(30, 14)
     puffs = ((8, 9, 5), (16, 6, 6), (25, 7, 5.5), (32, 10, 4.5)) if variant == 0 else ((7, 8, 4.5), (14, 6, 5.5), (22, 8, 4.5))
@@ -461,25 +441,6 @@ def cloud(variant):
         if y >= p.h - 4:
             p.g[(x, y)] = (220, 236, 250)
     return p.outline((170, 200, 230))
-
-
-def hills(far):
-    w, h = 192, 48
-    p = Px(w, h)
-    import math
-    base = (120, 200, 170) if far else (52, 182, 112)
-    top = (150, 220, 185) if far else (90, 210, 125)
-    for x in range(w):
-        a = math.sin(x / w * math.tau * 2) * 7 + math.sin(x / w * math.tau * 3 + 1) * 5
-        y0 = int((14 if far else 22) - a)
-        for y in range(max(0, y0), h):
-            p.put(x, y, top if y < y0 + 3 else base)
-    if not far:
-        for x in range(4, w, 23):
-            y0 = min(y for (xx, y) in p.g if xx == x)
-            p.disc(x, y0 + 2, 2.5, LEAF_M)
-            p.put(x, y0, LEAF_L)
-    return p
 
 
 def shed():
@@ -508,35 +469,6 @@ def shed():
         p.put(x, 21, c)
         p.put(x, 20, LEAF_L)
     return p.outline(WOOD_D)
-
-
-def beehive():
-    p = Px(16, 20)
-    gold, gold_d, gold_l = (236, 180, 60), (196, 130, 40), (255, 222, 120)
-    p.rect(7, 0, 8, 2, WOOD_M)              # hanging from a post
-    p.ellipse(7.5, 10, 6.5, 7.5, gold)
-    for y in (6, 10, 14):
-        for x in range(16):
-            if (x, y) in p.g:
-                p.put(x, y, gold_d)
-    for (x, y) in list(p.g):
-        if x < 6 and y in (4, 5, 8, 9, 12) and p.g[(x, y)] == gold:
-            p.g[(x, y)] = gold_l
-    p.ellipse(7.5, 14, 2, 1.6, WOOD_D)
-    return p.outline(WOOD_D)
-
-
-def bee(frame):
-    p = Px(7, 6)
-    p.rect(1, 3, 5, 5, (255, 214, 60))
-    p.rect(3, 3, 3, 5, INK)
-    p.put(5, 4, INK)
-    wing = (220, 240, 255)
-    if frame == 0:
-        p.rect(2, 0, 3, 2, wing)
-    else:
-        p.rect(1, 1, 3, 2, wing)
-    return p.outline(INK)
 
 
 def butterfly(frame, colour):
@@ -669,16 +601,24 @@ def sparkle():
     return p
 
 
+def shovel():
+    p = Px()
+    blade, blade_l, blade_d = (170, 178, 190), (220, 226, 235), (110, 116, 128)
+    p.line(11, 1, 6, 9, WOOD_M)              # handle
+    p.line(12, 1, 7, 9, WOOD_L)
+    p.rect(10, 0, 13, 1, WOOD_D)              # grip
+    p.rect(3, 9, 7, 13, blade)                # blade
+    p.rect(4, 14, 6, 14, blade)
+    p.put(5, 15, blade_d)
+    p.rect(3, 9, 3, 13, blade_l)
+    p.rect(7, 10, 7, 13, blade_d)
+    return p.outline()
+
+
 def decor():
-    sun().save(OUT / "sun.png")
     cloud(0).save(OUT / "cloud_0.png")
     cloud(1).save(OUT / "cloud_1.png")
-    hills(True).save(OUT / "hills_far.png")
-    hills(False).save(OUT / "hills_near.png")
     shed().save(OUT / "shed.png")
-    beehive().save(OUT / "beehive.png")
-    bee(0).save(OUT / "bee_0.png")
-    bee(1).save(OUT / "bee_1.png")
     for i, colour in enumerate(((255, 140, 200), (255, 214, 60), (120, 180, 255))):
         butterfly(0, colour).save(OUT / f"butterfly_{i}_0.png")
         butterfly(1, colour).save(OUT / f"butterfly_{i}_1.png")
@@ -698,6 +638,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for name in FRUIT:
         icon(name).save(ITEMS / f"{name}.png")
+    shovel().save(ITEMS / "shovel.png")
     plants()
     decor()
     print("wrote orchard art:", len(list(OUT.glob("*.png"))), "orchard sprites +", len(FRUIT), "fruit icons")

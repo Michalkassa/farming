@@ -1,10 +1,11 @@
 extends CanvasLayer
 ## The orchard: a separate sunny field reached from the farm's signpost.
 ## Three rows of plots (trees at the back, vines on trellises, bushes in front)
-## sit in a little fenced meadow with a smiling sun, drifting clouds, hills, a
-## shed, a beehive with bees, a pond, flowers and butterflies.
+## sit in a little fenced meadow under a blue sky with drifting clouds, with a
+## shed, a pond, a few flowers and butterflies.
 ##   Empty plot: click to pick a sapling to buy and plant.
 ##   Fruiting plant (sparkling): click to pick the fruit into your bags.
+##   Holding the shovel: click a plant to dig it up and free the plot.
 ## It sits under the HUD layer so the hotbar stays visible while you pick.
 ## The scene is drawn on a fixed design stage scaled to cover the window; the
 ## buttons and the sapling picker sit on a separate stage scaled to fit.
@@ -35,15 +36,11 @@ var _plants: Array[TextureRect] = []
 var _sparkles: Array[Control] = []
 var _clouds: Array[Dictionary] = []
 var _butterflies: Array[Dictionary] = []
-var _bees: Array[Dictionary] = []
-var _sun: TextureRect
-var _hive_pos: Vector2
 var _picker: Control
 ## The picker floats above the HUD (this screen sits below it) on its own layer.
 var _picker_layer: CanvasLayer
 var _picker_root: Control
 var _fade: Tween
-var _tooltip_left: float = 0.0
 var _textures: Dictionary = {}
 var _rng := RandomNumberGenerator.new()
 
@@ -174,27 +171,14 @@ func _build_sky() -> void:
 	var sky := TextureRect.new()
 	sky.texture = sky_tex
 	sky.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	sky.size = Vector2(design_size.x, 270)
+	sky.size = Vector2(design_size.x, 290)
 	sky.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_stage.add_child(sky)
 
-	_sun = _sprite(_stage, "sun", Vector2(930, 22), 4.0)
-	_sun.pivot_offset = _sun.size * 0.5
 	for i in 5:
-		var cloud := _sprite(_stage, "cloud_%d" % (i % 2), Vector2(_rng.randf_range(-100, design_size.x), _rng.randf_range(18, 120)), _rng.randf_range(2.5, 3.5))
+		var cloud := _sprite(_stage, "cloud_%d" % (i % 2), Vector2(_rng.randf_range(-100, design_size.x), _rng.randf_range(18, 190)), _rng.randf_range(2.5, 3.5))
 		cloud.modulate.a = 0.95
 		_clouds.append({"node": cloud, "speed": _rng.randf_range(6.0, 16.0)})
-
-	for layer_name in ["hills_far", "hills_near"]:
-		var hills := TextureRect.new()
-		hills.texture = _tex(layer_name)
-		hills.stretch_mode = TextureRect.STRETCH_TILE
-		hills.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		hills.size = Vector2(design_size.x / S + 16, 48)
-		hills.scale = Vector2(S, S)
-		hills.position = Vector2(-24 if layer_name == "hills_far" else 0, 120 if layer_name == "hills_far" else 150)
-		hills.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_stage.add_child(hills)
 
 func _build_ground() -> void:
 	var ground := ColorRect.new()
@@ -206,7 +190,7 @@ func _build_ground() -> void:
 
 	# Grass tufts and tiny bushes sprinkled everywhere for texture.
 	var decor_sheet := "res://Clover Valley V2 Free/Enviroment/Decor/Natural_Decor_free.png"
-	for i in 70:
+	for i in 22:
 		var tuft := AtlasTexture.new()
 		tuft.atlas = load(decor_sheet)
 		tuft.region = Rect2(0, 17, 16, 15) if i % 4 else Rect2(1, 1, 13, 14)
@@ -238,16 +222,8 @@ func _build_ground() -> void:
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_stage.add_child(title)
 
-	# The shed, beehive and wheelbarrow on the right; the pond below them.
+	# The shed and wheelbarrow on the right; the pond below them.
 	_planted(_stage, "shed", Vector2(1056, 300))
-	_hive_pos = Vector2(970, 236)
-	var post := ColorRect.new()
-	post.color = Color8(140, 60, 50)
-	post.position = _hive_pos + Vector2(-3, -36)
-	post.size = Vector2(6, 100)
-	post.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_stage.add_child(post)
-	_sprite(_stage, "beehive", _hive_pos - Vector2(24, 30))
 	_planted(_stage, "wheelbarrow", Vector2(1010, 380))
 	var pond := AtlasTexture.new()
 	pond.atlas = load("res://Clover Valley V2 Free/Tilesets/Water_free.png")
@@ -269,22 +245,17 @@ func _build_ground() -> void:
 		path.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_stage.add_child(path)
 
-	# Flowers and mushrooms around the edges and between the rows.
+	# A few flowers and mushrooms around the edges.
 	var spots := []
-	for i in 34:
+	for i in 12:
 		var edge := i % 3
 		var pos := Vector2(_rng.randf_range(10, 230), _rng.randf_range(320, 600)) if edge == 0 \
 			else (Vector2(_rng.randf_range(940, 1140), _rng.randf_range(540, 640)) if edge == 1 \
 			else Vector2(_rng.randf_range(220, 940), _rng.randf_range(540, 640)))
 		spots.append(pos)
 	for i in spots.size():
-		var name := "mushroom" if i % 9 == 0 else "flower_%d" % (i % 6)
+		var name := "mushroom" if i % 6 == 0 else "flower_%d" % (i % 6)
 		_planted(_stage, name, spots[i], 2.5)
-	for base in row_bases:
-		for c in columns.size() - 1:
-			if _rng.randf() < 0.7:
-				_planted(_stage, "flower_%d" % _rng.randi_range(0, 5), Vector2((columns[c] + columns[c + 1]) * 0.5 + _rng.randf_range(-12, 12), base + 4), 2.2)
-
 func _build_plots() -> void:
 	for i in Orchard.plots.size():
 		var row := i / Orchard.PLOTS_PER_ROW
@@ -315,7 +286,7 @@ func _build_plots() -> void:
 		_sparkles.append(sparkle)
 
 func _build_critters() -> void:
-	for i in 4:
+	for i in 2:
 		var node := _sprite(_stage, "butterfly_%d_0" % (i % 3), Vector2.ZERO, 3.0)
 		node.pivot_offset = node.size * 0.5
 		_butterflies.append({
@@ -323,10 +294,6 @@ func _build_critters() -> void:
 			"radius": Vector2(_rng.randf_range(80, 220), _rng.randf_range(30, 80)),
 			"speed": _rng.randf_range(0.15, 0.35), "phase": _rng.randf() * TAU,
 		})
-	for i in 3:
-		var bee := _sprite(_stage, "bee_0", Vector2.ZERO, 2.5)
-		_bees.append({"node": bee, "phase": i * TAU / 3.0, "speed": _rng.randf_range(1.2, 1.8)})
-
 func _build_ui() -> void:
 	var back := Button.new()
 	back.text = "< Farm"
@@ -343,8 +310,6 @@ func _process(delta: float) -> void:
 	if not visible:
 		return
 	var t := Time.get_ticks_msec() / 1000.0
-	_sun.rotation = sin(t * 0.6) * 0.06
-	_sun.position.y = 22 + roundf(sin(t * 0.9) * 3.0)
 	for cloud in _clouds:
 		var node: TextureRect = cloud.node
 		node.position.x += cloud.speed * delta
@@ -370,18 +335,6 @@ func _process(delta: float) -> void:
 		node.flip_h = -sin(a) < 0.0
 		node.position = pos
 		node.texture = _tex("butterfly_%d_%d" % [b.colour, frame])
-	var bee_frame := int(t * 14.0) % 2
-	for b in _bees:
-		var node: TextureRect = b.node
-		var a: float = t * b.speed + b.phase
-		node.position = _hive_pos + Vector2(sin(a) * 34.0, sin(a * 2.0) * 14.0 - 6.0)
-		node.flip_h = cos(a) < 0.0
-		node.texture = _tex("bee_%d" % bee_frame)
-	_tooltip_left -= delta
-	if _tooltip_left <= 0.0:
-		_tooltip_left = 0.5
-		for i in _plots.size():
-			_plots[i].tooltip_text = _plot_tooltip(i)
 
 # --- Plots --------------------------------------------------------------------
 
@@ -419,14 +372,14 @@ func _plot_tooltip(index: int) -> String:
 		return "Plant a %s" % Orchard.row_of(index)
 	var item: ItemData = ItemDatabase.get_item(plot.plant)
 	var name: String = item.display_name if item else String(plot.plant)
-	if plot.stock > 0:
-		return "%s: %d ready to pick!" % [name, plot.stock]
-	var seconds := ceili(Orchard.time_to_fruit(index))
-	return "%s: fruit in %d:%02d" % [name, seconds / 60, seconds % 60]
+	return name
 
 ## An empty plot shows a ghostly sprout while hovered, to say "plant here".
 func _hover(index: int, on: bool) -> void:
 	var plant := _plants[index]
+	if on and Orchard.stage(index) >= 0 and _holding_shovel():
+		plant.modulate = Color(1.25, 0.8, 0.75)   # about to be dug up
+		return
 	if Orchard.stage(index) < 0:
 		plant.texture = _tex("%s_0" % Orchard.row_of(index))
 		plant.size = plant.texture.get_size() * S
@@ -442,6 +395,9 @@ func _on_plot_input(event: InputEvent, index: int) -> void:
 		return
 	_plots[index].accept_event()
 	var stage := Orchard.stage(index)
+	if stage >= 0 and _holding_shovel():
+		_dig(index)
+		return
 	if stage < 0:
 		_open_picker(index)
 	elif stage == 3:
@@ -453,6 +409,44 @@ func _on_plot_input(event: InputEvent, index: int) -> void:
 			_wobble(_plants[index])
 	else:
 		_wobble(_plants[index])
+
+func _holding_shovel() -> bool:
+	var item: ItemData = GameState.selected_item()
+	return item != null and item.tool_kind == &"shovel"
+
+## The plant pops out of the ground with a little spray of dirt, freeing the plot.
+func _dig(index: int) -> void:
+	var plant := _plants[index]
+	var ghost := TextureRect.new()
+	ghost.texture = plant.texture
+	ghost.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ghost.size = plant.size
+	ghost.position = _plots[index].position + plant.position
+	ghost.pivot_offset = Vector2(ghost.size.x * 0.5, ghost.size.y)
+	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stage.add_child(ghost)
+	if not Orchard.dig_up(index):
+		ghost.queue_free()
+		return
+	var tween := ghost.create_tween().set_parallel(true)
+	tween.tween_property(ghost, "position:y", ghost.position.y - 40, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(ghost, "rotation", 0.5, 0.45)
+	tween.tween_property(ghost, "modulate:a", 0.0, 0.3).set_delay(0.15)
+	tween.chain().tween_callback(ghost.queue_free)
+	var foot := _plots[index].position + Vector2(_plots[index].size.x * 0.5, _plots[index].size.y)
+	for n in 6:
+		var clod := ColorRect.new()
+		clod.color = Color8(120, 72, 46) if n % 2 else Color8(150, 94, 60)
+		clod.size = Vector2(9, 9)
+		clod.position = foot - clod.size * 0.5
+		clod.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_stage.add_child(clod)
+		var out := foot + Vector2(_rng.randf_range(-55, 55), _rng.randf_range(-50, -15))
+		var t2 := clod.create_tween()
+		t2.tween_property(clod, "position", out, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		t2.tween_property(clod, "position:y", foot.y - 4, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		t2.tween_property(clod, "modulate:a", 0.0, 0.3)
+		t2.tween_callback(clod.queue_free)
 
 # --- Sapling picker -----------------------------------------------------------
 

@@ -151,15 +151,16 @@ These outputs come from `Brewing.brew()` in headless Godot, using only items the
 ## 7. Orchard (separate screen) ✅
 
 The orchard is its own screen (`ui/orchard_screen.gd`, state in the `Orchard` autoload). You reach it from the
-**ORCHARD signpost** between the animal pen and the shop. It's a sunny fenced meadow with a smiling sun, drifting
-clouds, hills, an entrance arch, a shed with a heart window, a beehive with buzzing bees, a pond, a fruit-laden
-wheelbarrow, flowers, mushrooms and butterflies. Plants sway, and fruiting plants sparkle.
+**ORCHARD signpost** between the animal pen and the shop. It's a fenced meadow under a blue sky with drifting clouds,
+with an entrance arch, a shed, a pond, a wheelbarrow, a few flowers and butterflies. Plants sway, and fruiting plants
+sparkle.
 
 - **Three rows of 5 plots:** trees at the back, vines on trellises in the middle, bushes at the front. Each row only takes its own kind.
 - **Click an empty plot** to open the sapling picker and buy a sapling straight into it. Plants are permanent.
 - A plant grows through 3 stages, then fruits. **Click a sparkling plant** to pick everything into your bags (whatever doesn't fit stays on the plant). It then fruits again on its timer.
 - Plants keep growing while you're elsewhere (in-session) and are saved. The dog's growth bonus applies here too.
-- Hover a plant to see how long until it fruits.
+- **Shovel** (Tools tab, €150): hold it and click a plant to dig it up and free the plot. No refund.
+- Plants don't show a timer; you just see them grow and sparkle when ready.
 - Tomato, Strawberry and Watermelon stay on the farm's field plots.
 
 | Row | Plant | Sapling | First fruit after | Then every | Yield |

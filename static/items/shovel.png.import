@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dgko1pb13r1qa"
-path="res://.godot/imported/hills_far.png-7777df74bc7099cd19b792e3b8144436.ctex"
+uid="uid://caktf41ax1dvs"
+path="res://.godot/imported/shovel.png-0fa5989a70b714df6c7fb68f87f04895.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://static/orchard/hills_far.png"
-dest_files=["res://.godot/imported/hills_far.png-7777df74bc7099cd19b792e3b8144436.ctex"]
+source_file="res://static/items/shovel.png"
+dest_files=["res://.godot/imported/shovel.png-0fa5989a70b714df6c7fb68f87f04895.ctex"]
 
 [params]
 
