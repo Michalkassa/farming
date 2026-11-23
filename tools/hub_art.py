@@ -150,15 +150,19 @@ def shelf():
 
 # --- Hub stall ----------------------------------------------------------------
 
-def paste_keeper(c, ox, oy, rows=15):
-    """The scarecrow from the Clover Valley objects sheet, minding the stall."""
-    sheet = Image.open(CLOVER / "Enviroment/Objects/Objects_free.png").convert("RGBA")
-    keeper = sheet.crop((0, 2, 16, 2 + rows))
-    for y in range(keeper.height):
-        for x in range(keeper.width):
-            r, g, b, a = keeper.getpixel((x, y))
-            if a > 0:
-                c.put(ox + x, oy + y, (r, g, b))
+def stocked_shelf(c, x0, x1, y):
+    """A little shelf across the stall's back wall, packed with goods."""
+    c.rect(x0, y, x1, y, WOOD_LT)
+    c.rect(x0, y + 1, x1, y + 1, WOOD_DK)
+    goods = [(226, 64, 52), (250, 212, 84), (246, 140, 40), (130, 60, 170), (90, 160, 60),
+             (255, 244, 222), (255, 150, 200), (226, 64, 52), (250, 212, 84), (110, 160, 230)]
+    x = x0 + 1
+    i = 0
+    while x + 1 <= x1 - 1:
+        col = goods[i % len(goods)]
+        c.rect(x, y - 2, x + 1, y - 1, col)
+        x += 3
+        i += 1
 
 
 def hub_stall():
@@ -171,7 +175,8 @@ def hub_stall():
     c.rect(8, 18, 47, 36, BACK)
     for x in range(8, 48, 4):
         c.rect(x, 18, x, 36, BACK_DK)
-    paste_keeper(c, 20, 21)
+    stocked_shelf(c, 9, 46, 24)
+    stocked_shelf(c, 9, 46, 30)
     c.rect(5, 14, 8, 50, WOOD); c.rect(5, 14, 5, 50, WOOD_LT)
     c.rect(47, 14, 50, 50, WOOD); c.rect(50, 14, 50, 50, WOOD_DK)
     # Counter.
@@ -206,6 +211,29 @@ def hub_stall():
     c.outline()
     for p, col in shadow.px.items():
         c.px.setdefault(p, col)
+    return c
+
+
+def coin_stack():
+    """A little stack of gold coins, for the shop's sell-everything button."""
+    c = Canvas(16, 16)
+    gold, gold_dk, gold_lt = (250, 200, 60), (196, 140, 30), (255, 236, 150)
+    for i, (cx, cy) in enumerate(((8, 12), (8, 9), (8, 6))):
+        c.ellipse(cx, cy, 5.5, 2.5, gold)
+        c.rect(cx - 5, cy, cx + 5, cy + 1, gold_dk)
+        c.ellipse(cx, cy - 0.5, 4, 1.5, gold_lt)
+    c.rect(7, 5, 8, 5, gold_dk)
+    c.outline()
+    return c
+
+
+def check_mark():
+    """A green tick for things you already own."""
+    c = Canvas(11, 9)
+    green = (90, 190, 70)
+    for x, y in ((1, 4), (2, 5), (3, 6), (4, 5), (5, 4), (6, 3), (7, 2), (8, 1)):
+        c.rect(x, y, x + 1, y + 1, green)
+    c.outline((30, 70, 30))
     return c
 
 
@@ -566,6 +594,8 @@ def main():
     post().save("post.png")
     shelf().save("shelf.png")
     hub_stall().save("hub_stall.png")
+    coin_stack().save("coin.png")
+    check_mark().save("check.png")
     print("wrote stall art to", OUT)
 
 

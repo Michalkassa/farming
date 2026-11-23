@@ -20,6 +20,8 @@ config/icon="res://icon.png"
 [autoload]
 
 ItemDatabase="*res://scripts/item_database.tscn"
+Winery="*res://scripts/winery.gd"
+Orchard="*res://scripts/orchard.gd"
 GameState="*res://scripts/game_state.tscn"
 
 [display]
