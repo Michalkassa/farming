@@ -127,6 +127,13 @@ func _make_custom_tooltip(_for_text: String) -> Object:
 	name_label.add_theme_color_override("font_color", tooltip_name_color)
 	v.add_child(name_label)
 
+	if item.description != "":
+		var desc_label := Label.new()
+		desc_label.text = item.description
+		desc_label.add_theme_font_size_override("font_size", tooltip_price_font_size)
+		desc_label.add_theme_color_override("font_color", tooltip_name_color.darkened(0.15))
+		v.add_child(desc_label)
+
 	var price_label := Label.new()
 	if item.sell_price > 0:
 		price_label.text = tooltip_sell_format % item.sell_price

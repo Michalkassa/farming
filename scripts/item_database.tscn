@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Script" path="res://scripts/item_database.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/item_data.gd" id="2_item_data"]
@@ -29,7 +29,13 @@
 [ext_resource type="Resource" path="res://resources/items/bronze_can.tres" id="item_24"]
 [ext_resource type="Resource" path="res://resources/items/silver_can.tres" id="item_25"]
 [ext_resource type="Resource" path="res://resources/items/gold_can.tres" id="item_26"]
+[ext_resource type="Resource" path="res://resources/items/bakers_yeast.tres" id="item_27"]
+[ext_resource type="Resource" path="res://resources/items/wine_yeast.tres" id="item_28"]
+[ext_resource type="Resource" path="res://resources/items/ale_yeast.tres" id="item_29"]
+[ext_resource type="Resource" path="res://resources/items/mead_yeast.tres" id="item_30"]
+[ext_resource type="Resource" path="res://resources/items/champagne_yeast.tres" id="item_31"]
+[ext_resource type="Resource" path="res://resources/items/wild_yeast.tres" id="item_32"]
 
 [node name="ItemDatabase" type="Node"]
 script = ExtResource("1_script")
-items = Array[ExtResource("2_item_data")]([ExtResource("item_0"), ExtResource("item_1"), ExtResource("item_2"), ExtResource("item_3"), ExtResource("item_4"), ExtResource("item_5"), ExtResource("item_6"), ExtResource("item_7"), ExtResource("item_8"), ExtResource("item_9"), ExtResource("item_10"), ExtResource("item_11"), ExtResource("item_12"), ExtResource("item_13"), ExtResource("item_14"), ExtResource("item_15"), ExtResource("item_16"), ExtResource("item_17"), ExtResource("item_18"), ExtResource("item_19"), ExtResource("item_20"), ExtResource("item_21"), ExtResource("item_22"), ExtResource("item_23"), ExtResource("item_24"), ExtResource("item_25"), ExtResource("item_26")])
+items = Array[ExtResource("2_item_data")]([ExtResource("item_0"), ExtResource("item_1"), ExtResource("item_2"), ExtResource("item_3"), ExtResource("item_4"), ExtResource("item_5"), ExtResource("item_6"), ExtResource("item_7"), ExtResource("item_8"), ExtResource("item_9"), ExtResource("item_10"), ExtResource("item_11"), ExtResource("item_12"), ExtResource("item_13"), ExtResource("item_14"), ExtResource("item_15"), ExtResource("item_16"), ExtResource("item_17"), ExtResource("item_18"), ExtResource("item_19"), ExtResource("item_20"), ExtResource("item_21"), ExtResource("item_22"), ExtResource("item_23"), ExtResource("item_24"), ExtResource("item_25"), ExtResource("item_26"), ExtResource("item_27"), ExtResource("item_28"), ExtResource("item_29"), ExtResource("item_30"), ExtResource("item_31"), ExtResource("item_32")])

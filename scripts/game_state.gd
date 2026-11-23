@@ -42,6 +42,25 @@ const SAVE_VERSION := 1
 	"astoria": {"money_for": "dog"},
 }
 
+@export_group("Retired Items")
+## Items that no longer exist, with what they cost. Stacks of them found in a
+## save are turned back into money instead of silently vanishing.
+@export var retired_item_refunds: Dictionary = {
+	"honey": 60,
+	"cane_sugar": 15,
+	"mint": 30,
+	"lavender": 40,
+	"rosemary": 40,
+	"chamomile": 40,
+	"rose_petal": 90,
+	"saffron": 800,
+	"ginger": 50,
+	"cinnamon": 120,
+	"oak_chips": 80,
+	"vanilla_bean": 300,
+	"chili": 35,
+}
+
 @export_group("Saving")
 @export var autosave_seconds: float = 3.0
 
@@ -423,6 +442,29 @@ func count_owned(item_id: StringName) -> int:
 				total += slot.count
 	return total
 
+## Removes up to `count` of an item, backpack first so the hand keeps what the
+## player is holding. Returns how many were taken.
+func take_item(item_id: StringName, count: int) -> int:
+	var taken := 0
+	for cont_name in ["inventory", "hotbar"]:
+		var cont := container(cont_name)
+		var touched := false
+		for i in range(cont.size() - 1, -1, -1):
+			if taken >= count:
+				break
+			var slot: ItemStack = cont[i]
+			if slot == null or slot.item_id != item_id:
+				continue
+			var moved: int = mini(slot.count, count - taken)
+			slot.count -= moved
+			taken += moved
+			touched = true
+			if slot.count <= 0:
+				cont[i] = null
+		if touched:
+			_emit_changed(cont_name)
+	return taken
+
 ## Things the stall farmer will buy off you: anything with a price except tools.
 func sellable_items() -> Array:
 	var seen: Dictionary = {}
@@ -577,6 +619,7 @@ func reset_progress() -> void:
 	cursor = null
 	animals.clear()
 	redeemed_codes.clear()
+	Winery.reset()
 	for i in inventory.size():
 		inventory[i] = null
 	for i in hotbar.size():
@@ -611,6 +654,7 @@ func save_data() -> Dictionary:
 		"animals": _pack_animals(),
 		"codes": redeemed_codes.duplicate(),
 		"zones": _zone_states,
+		"winery": Winery.save_state(),
 	}
 
 func _load_game() -> bool:
@@ -627,6 +671,8 @@ func _load_game() -> bool:
 
 	money = maxi(0, int(data.get("money", starting_money)))
 	selected_hotbar = clampi(int(data.get("selected_hotbar", 0)), 0, hotbar_size - 1)
+	# Bottle items are registered at runtime, so they must exist before the bags unpack.
+	Winery.load_state(data.get("winery", {}))
 	_unpack_container(inventory, data.get("inventory"))
 	_unpack_container(hotbar, data.get("hotbar"))
 	_unpack_container(sell_grid, data.get("sell"))
@@ -674,6 +720,9 @@ func _to_stack(data: Variant) -> ItemStack:
 	var item_id := StringName(data.get("id", ""))
 	var count := int(data.get("n", 0))
 	var item: ItemData = ItemDatabase.get_item(item_id)
+	if item == null and count > 0 and retired_item_refunds.has(String(item_id)):
+		money += int(retired_item_refunds[String(item_id)]) * count
+		return null
 	if item == null or count <= 0:
 		return null
 	return ItemStack.new(item_id, mini(count, item.max_stack))

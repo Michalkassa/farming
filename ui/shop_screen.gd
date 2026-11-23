@@ -2,6 +2,8 @@ extends CanvasLayer
 ## The shop stall, seen from the customer's side of the counter: the scarecrow
 ## keeper sells seeds, animals and tools, and buys your produce back.
 
+const Brewing := preload("res://scripts/brewing.gd")
+
 @export var card_scene: PackedScene
 
 @export_group("Layout")
@@ -119,8 +121,12 @@ func _items_for_tab() -> Array:
 		return GameState.sellable_items()
 	var result: Array = []
 	for item in ItemDatabase.shop_items():
-		var keep: bool = item.is_animal() if _tab == "animals" \
-			else (item.is_tool() if _tab == "tools" else item.is_seed())
+		var keep: bool
+		match _tab:
+			"animals": keep = item.is_animal()
+			"tools": keep = item.is_tool()
+			"wine": keep = Brewing.YEASTS.has(item.id)
+			_: keep = item.is_seed()
 		if keep:
 			result.append(item)
 	return result
@@ -150,7 +156,7 @@ func _refresh_cards() -> void:
 func _produce_value() -> int:
 	var total := 0
 	for item in GameState.sellable_items():
-		if not item.is_seed():
+		if not item.for_sale:  # keep seeds, yeasts and additions you bought
 			total += item.sell_price * GameState.count_owned(item.id)
 	return total
 
@@ -185,7 +191,7 @@ func _on_sell(card: StallCard, count: int) -> void:
 func _on_sell_all() -> void:
 	var earned := 0
 	for item in GameState.sellable_items():
-		if not item.is_seed():
+		if not item.for_sale:  # keep seeds, yeasts and additions you bought
 			earned += GameState.sell_item(item.id, GameState.count_owned(item.id))
 	if earned <= 0:
 		return
