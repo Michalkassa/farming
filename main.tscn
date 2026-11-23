@@ -26,7 +26,6 @@
 [ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Buildings/Pre-made/premade-buildings_free.png" id="h_buildings"]
 [ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Enviroment/Trees/Trees_free.png" id="h_trees"]
 [ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Enviroment/Decor/Natural_Decor_free.png" id="h_decor"]
-[ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Enviroment/Objects/Objects_free.png" id="h_objects"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0xm2m"]
 texture = ExtResource("1_ig7tw")
@@ -102,10 +101,6 @@ region = Rect2(0, 17, 16, 15)
 atlas = ExtResource("h_decor")
 region = Rect2(1, 1, 13, 14)
 
-[sub_resource type="AtlasTexture" id="Atlas_scarecrow"]
-atlas = ExtResource("h_objects")
-region = Rect2(0, 2, 16, 30)
-
 [node name="Main" type="Node2D" unique_id=15553881]
 
 [node name="GrassTileMap" type="TileMap" parent="." unique_id=1530139131]
@@ -120,12 +115,6 @@ tile = ExtResource("h_path_sand")
 roads = Array[Rect2i]([Rect2i(-3, 10, 30, 1), Rect2i(17, 5, 1, 5), Rect2i(17, 5, 4, 1)])
 
 [node name="Decor" type="Node2D" parent="."]
-
-[node name="Scarecrow" type="Sprite2D" parent="Decor"]
-texture_filter = 1
-position = Vector2(130, 62)
-texture = SubResource("Atlas_scarecrow")
-centered = false
 
 [node name="ShopTree" type="Sprite2D" parent="Decor"]
 texture_filter = 1

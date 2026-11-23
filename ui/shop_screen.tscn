@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" path="res://ui/shop_screen.gd" id="1_screen"]
 [ext_resource type="PackedScene" path="res://ui/stall_card.tscn" id="2_card"]
-[ext_resource type="Texture2D" path="res://Clover Valley V2 Free/Enviroment/Objects/Objects_free.png" id="3_objects"]
 [ext_resource type="Texture2D" path="res://static/shop/back_wall.png" id="6_wall"]
 [ext_resource type="Texture2D" path="res://static/shop/shelf.png" id="7_shelf"]
 [ext_resource type="Texture2D" path="res://static/shop/post.png" id="8_post"]
@@ -19,10 +18,6 @@ width = 4
 height = 64
 fill_from = Vector2(0, 0)
 fill_to = Vector2(0, 1)
-
-[sub_resource type="AtlasTexture" id="Scarecrow"]
-atlas = ExtResource("3_objects")
-region = Rect2(0, 2, 16, 30)
 
 [sub_resource type="ButtonGroup" id="TabGroup"]
 
@@ -71,110 +66,74 @@ texture = ExtResource("6_wall")
 expand_mode = 1
 stretch_mode = 1
 
-[node name="ShelfL1" type="TextureRect" parent="Screen/Stage"]
+[node name="Shelf1" type="TextureRect" parent="Screen/Stage"]
 layout_mode = 0
-offset_left = 150.0
-offset_top = 250.0
-offset_right = 206.0
-offset_bottom = 256.0
+offset_left = 140.0
+offset_top = 190.0
+offset_right = 314.0
+offset_bottom = 196.0
 scale = Vector2(5, 5)
 mouse_filter = 2
 texture = ExtResource("7_shelf")
 expand_mode = 1
 stretch_mode = 1
 
-[node name="ShelfL2" type="TextureRect" parent="Screen/Stage"]
+[node name="ShelfGoods1" type="HBoxContainer" parent="Screen/Stage"]
+unique_name_in_owner = true
 layout_mode = 0
-offset_left = 150.0
-offset_top = 350.0
-offset_right = 206.0
-offset_bottom = 356.0
+offset_left = 140.0
+offset_top = 134.0
+offset_right = 1010.0
+offset_bottom = 190.0
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="Shelf2" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 280.0
+offset_right = 314.0
+offset_bottom = 286.0
 scale = Vector2(5, 5)
 mouse_filter = 2
 texture = ExtResource("7_shelf")
 expand_mode = 1
 stretch_mode = 1
 
-[node name="ShelfR1" type="TextureRect" parent="Screen/Stage"]
+[node name="ShelfGoods2" type="HBoxContainer" parent="Screen/Stage"]
+unique_name_in_owner = true
 layout_mode = 0
-offset_left = 722.0
-offset_top = 250.0
-offset_right = 778.0
-offset_bottom = 256.0
+offset_left = 140.0
+offset_top = 224.0
+offset_right = 1010.0
+offset_bottom = 280.0
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="Shelf3" type="TextureRect" parent="Screen/Stage"]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 370.0
+offset_right = 314.0
+offset_bottom = 376.0
 scale = Vector2(5, 5)
 mouse_filter = 2
 texture = ExtResource("7_shelf")
 expand_mode = 1
 stretch_mode = 1
 
-[node name="ShelfR2" type="TextureRect" parent="Screen/Stage"]
-layout_mode = 0
-offset_left = 722.0
-offset_top = 350.0
-offset_right = 778.0
-offset_bottom = 356.0
-scale = Vector2(5, 5)
-mouse_filter = 2
-texture = ExtResource("7_shelf")
-expand_mode = 1
-stretch_mode = 1
-
-[node name="ShelfGoodsL1" type="HBoxContainer" parent="Screen/Stage"]
+[node name="ShelfGoods3" type="HBoxContainer" parent="Screen/Stage"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 150.0
-offset_top = 194.0
-offset_right = 430.0
-offset_bottom = 250.0
+offset_left = 140.0
+offset_top = 314.0
+offset_right = 1010.0
+offset_bottom = 370.0
 mouse_filter = 2
 alignment = 1
-theme_override_constants/separation = 10
-
-[node name="ShelfGoodsL2" type="HBoxContainer" parent="Screen/Stage"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 150.0
-offset_top = 294.0
-offset_right = 430.0
-offset_bottom = 350.0
-mouse_filter = 2
-alignment = 1
-theme_override_constants/separation = 10
-
-[node name="ShelfGoodsR1" type="HBoxContainer" parent="Screen/Stage"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 722.0
-offset_top = 194.0
-offset_right = 1002.0
-offset_bottom = 250.0
-mouse_filter = 2
-alignment = 1
-theme_override_constants/separation = 10
-
-[node name="ShelfGoodsR2" type="HBoxContainer" parent="Screen/Stage"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 722.0
-offset_top = 294.0
-offset_right = 1002.0
-offset_bottom = 350.0
-mouse_filter = 2
-alignment = 1
-theme_override_constants/separation = 10
-
-[node name="Keeper" type="TextureRect" parent="Screen/Stage"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 568.0
-offset_top = 404.0
-offset_right = 584.0
-offset_bottom = 434.0
-scale = Vector2(8, 8)
-pivot_offset = Vector2(8, 30)
-mouse_filter = 2
-texture = SubResource("Scarecrow")
-expand_mode = 1
+theme_override_constants/separation = 12
 
 [node name="PostL" type="TextureRect" parent="Screen/Stage"]
 layout_mode = 0

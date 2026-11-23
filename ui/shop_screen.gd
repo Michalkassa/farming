@@ -1,6 +1,7 @@
 extends CanvasLayer
-## The shop stall, seen from the customer's side of the counter: the scarecrow
-## keeper sells seeds, animals and tools, and buys your produce back.
+## The shop stall, seen from the customer's side of the counter, its back
+## shelves packed with goods. It sells seeds, animals, tools and yeast, and
+## buys your produce back.
 
 const Brewing := preload("res://scripts/brewing.gd")
 
@@ -12,12 +13,6 @@ const Brewing := preload("res://scripts/brewing.gd")
 @export var horizon_y: float = 470.0
 @export var fade_seconds: float = 0.18
 
-@export_group("Keeper")
-@export var bob_pixels: float = 8.0
-@export var bob_speed: float = 0.5
-@export var hop_pixels: float = 24.0
-@export var hop_seconds: float = 0.12
-
 @export_group("Text")
 @export var money_format: String = "€%d"
 @export var sell_all_format: String = "Sell produce €%d"
@@ -26,7 +21,6 @@ const Brewing := preload("res://scripts/brewing.gd")
 @onready var _screen: Control = $Screen
 @onready var _grass: Control = $Screen/Grass
 @onready var _stage: Control = $Screen/Stage
-@onready var _keeper: TextureRect = %Keeper
 @onready var _tabs: HBoxContainer = %Tabs
 @onready var _sell_all: Button = %SellAll
 @onready var _goods: HBoxContainer = %Goods
@@ -34,16 +28,13 @@ const Brewing := preload("res://scripts/brewing.gd")
 @onready var _empty_hint: Label = %EmptyHint
 @onready var _money_label: Label = %MoneyLabel
 @onready var _back_button: Button = %BackButton
-@onready var _shelf_rows: Array[Node] = [%ShelfGoodsL1, %ShelfGoodsR1, %ShelfGoodsL2, %ShelfGoodsR2]
+@onready var _shelf_rows: Array[Node] = [%ShelfGoods1, %ShelfGoods2, %ShelfGoods3]
 
 var _tab: String = "seeds"
-var _keeper_rest: Vector2
-var _hop: Tween
 var _fade: Tween
 
 func _ready() -> void:
 	visible = false
-	_keeper_rest = _keeper.position
 	for tab in _tabs.get_children():
 		if tab is Button and tab.toggle_mode:
 			tab.pressed.connect(_on_tab.bind(tab.name.to_lower()))
@@ -89,12 +80,6 @@ func _fit() -> void:
 	_stage.position = ((screen - design_size * factor) * 0.5).floor()
 	_grass.position = Vector2(0, _stage.position.y + horizon_y * factor)
 	_grass.size = Vector2(screen.x, maxf(0.0, screen.y - _grass.position.y))
-
-func _process(_delta: float) -> void:
-	if not visible or (_hop and _hop.is_running()):
-		return
-	var t := Time.get_ticks_msec() / 1000.0
-	_keeper.position = _keeper_rest + Vector2(0, roundf(sin(t * bob_speed * TAU)) * bob_pixels)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible or not (event is InputEventKey):
@@ -169,7 +154,6 @@ func _refresh_sell_all() -> void:
 func _on_buy(card: StallCard) -> void:
 	var reason := GameState.buy_block_reason(card.item.id)
 	if reason == &"" and GameState.buy(card.item.id):
-		_cheer()
 		_coin_popup(card, -card.item.buy_price)
 		card.bump(true)
 		_refresh_cards()
@@ -180,7 +164,6 @@ func _on_sell(card: StallCard, count: int) -> void:
 	var earned := GameState.sell_item(card.item.id, count)
 	if earned <= 0:
 		return
-	_cheer()
 	_coin_popup(card, earned)
 	if GameState.count_owned(card.item.id) <= 0:
 		_populate()
@@ -195,18 +178,8 @@ func _on_sell_all() -> void:
 			earned += GameState.sell_item(item.id, GameState.count_owned(item.id))
 	if earned <= 0:
 		return
-	_cheer()
 	_coin_popup(_sell_all, earned)
 	_populate()
-
-## The keeper hops for joy when money changes hands.
-func _cheer() -> void:
-	if _hop:
-		_hop.kill()
-	_keeper.position = _keeper_rest
-	_hop = create_tween().set_trans(Tween.TRANS_QUAD)
-	_hop.tween_property(_keeper, "position:y", _keeper_rest.y - hop_pixels, hop_seconds).set_ease(Tween.EASE_OUT)
-	_hop.tween_property(_keeper, "position:y", _keeper_rest.y, hop_seconds).set_ease(Tween.EASE_IN)
 
 ## "+€12" / "-€4" floating up from where the money changed hands.
 func _coin_popup(from: Control, amount: int) -> void:
@@ -236,13 +209,16 @@ func _on_goods_changed() -> void:
 	if visible:
 		_refresh_cards()
 
-## Decorative goods on the back shelves: seeds up top, produce below.
+## Decorative goods packing the back shelves: seeds and yeast on top, farm
+## produce in the middle, orchard fruit at the bottom.
 func _stock_shelves() -> void:
 	var rows := [
-		[&"wheat_seeds", &"carrot_seeds", &"corn_seeds", &"tomato_seeds"],
-		[&"strawberry_seeds", &"watermelon_seeds", &"egg", &"milk"],
-		[&"carrot", &"tomato", &"strawberry", &"corn"],
-		[&"watermelon", &"wheat", &"bacon", &"egg"],
+		[&"wheat_seeds", &"carrot_seeds", &"corn_seeds", &"tomato_seeds", &"strawberry_seeds", &"watermelon_seeds",
+			&"wine_yeast", &"bakers_yeast", &"ale_yeast", &"mead_yeast", &"champagne_yeast", &"wild_yeast"],
+		[&"carrot", &"tomato", &"strawberry", &"corn", &"watermelon", &"wheat",
+			&"egg", &"milk", &"bacon", &"egg", &"milk", &"tomato"],
+		[&"apple", &"pear", &"orange", &"lemon", &"cherry", &"peach",
+			&"plum", &"grape", &"blueberry", &"raspberry", &"mango", &"pineapple"],
 	]
 	for i in mini(rows.size(), _shelf_rows.size()):
 		for id in rows[i]:
