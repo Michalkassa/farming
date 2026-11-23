@@ -4,7 +4,7 @@ extends Resource
 @export var kind: StringName = &""
 @export var idle_textures: Array[Texture2D] = []
 @export var walk_textures: Array[Texture2D] = []
-@export var idle_fps: float = 3.0
+@export var idle_fps: float = 1.0
 @export var walk_fps: float = 7.0
 
 @export_group("Wandering")

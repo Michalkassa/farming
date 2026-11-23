@@ -7,7 +7,10 @@ extends CanvasLayer
 ##   every free slot it can. Nothing stacks: one item per slot.
 ##   Barrel slot: click to take its item back.
 ## The layout is built in code on a fixed design stage that's scaled to fit,
-## like the shop.
+## like the shop. Around it is a cosy stone cellar: beams overhead, a flickering
+## lantern and candle, a window letting in a dusty shaft of daylight, a wine
+## rack, a stack of barrels with a sleeping cat, cobwebs and a soft vignette.
+## The barrel bubbles while it ferments.
 
 const Brewing := preload("res://scripts/brewing.gd")
 
@@ -23,10 +26,9 @@ const Brewing := preload("res://scripts/brewing.gd")
 
 @export_group("Art")
 @export var barrel_texture: Texture2D = preload("res://static/winery/barrel.png")
-@export var wall_texture: Texture2D = preload("res://static/shop/barn_wall.png")
 @export var slot_texture: Texture2D = preload("res://static/ui/slot_inset.png")
 @export var seal_icon: Texture2D = preload("res://static/winery/barrel.png")
-@export var wall_tint: Color = Color(0.42, 0.34, 0.3)
+@export var wall_tint: Color = Color(0.62, 0.56, 0.54)
 
 @export_group("Text")
 @export var money_format: String = "€%d"
@@ -43,6 +45,14 @@ var _pantry_grid: GridContainer
 var _money_label: Label
 var _fade: Tween
 var _ferment_bar: ProgressBar
+# Ambience.
+var _glows: Array[Dictionary] = []          # {node, base_alpha, base_scale, phase}
+var _motes: Array[Dictionary] = []          # {node, origin, phase, speed}
+var _cat: TextureRect
+var _candle: TextureRect
+var _bubble_left: float = 0.0
+var _gurgle_left: float = 2.0
+var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
 	layer = 20
@@ -84,9 +94,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
 		close()
 
-func _process(_delta: float) -> void:
-	if visible and _ferment_bar and Winery.state == Winery.State.FERMENTING:
+func _process(delta: float) -> void:
+	if not visible:
+		return
+	if _ferment_bar and Winery.state == Winery.State.FERMENTING:
 		_ferment_bar.value = Winery.ferment_progress()
+	_animate_ambience(delta)
 
 func _fit() -> void:
 	var screen := get_viewport().get_visible_rect().size
@@ -106,19 +119,12 @@ func _build() -> void:
 	cellar.color = Color(0.13, 0.09, 0.07)
 	cellar.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_screen.add_child(cellar)
-	var wall := TextureRect.new()
-	wall.texture = wall_texture
-	wall.stretch_mode = TextureRect.STRETCH_TILE
-	wall.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	wall.modulate = wall_tint
-	wall.set_anchors_preset(Control.PRESET_FULL_RECT)
-	wall.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_screen.add_child(wall)
 
 	_stage = Control.new()
 	_stage.size = design_size
 	_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_screen.add_child(_stage)
+	_build_ambience()
 
 	var back := Button.new()
 	back.text = "<"
@@ -140,6 +146,175 @@ func _build() -> void:
 
 	_build_barrel()
 	_build_pantry()
+
+# --- Cellar ambience -----------------------------------------------------------
+
+## A pixel sprite on the stage at `pos` (top-left), drawn at `scale`.
+func _deco(path: String, pos: Vector2, scale: float) -> TextureRect:
+	var rect := TextureRect.new()
+	rect.texture = load(path)
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_SCALE
+	rect.size = rect.texture.get_size() * scale
+	rect.position = pos
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stage.add_child(rect)
+	return rect
+
+## Tiled art filling `rect` (design px), drawn at `scale`.
+func _tiled(path: String, rect: Rect2, scale: float, tint: Color = Color.WHITE) -> TextureRect:
+	var tiles := TextureRect.new()
+	tiles.texture = load(path)
+	tiles.stretch_mode = TextureRect.STRETCH_TILE
+	tiles.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tiles.position = rect.position
+	tiles.size = rect.size / scale
+	tiles.scale = Vector2(scale, scale)
+	tiles.modulate = tint
+	tiles.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stage.add_child(tiles)
+	return tiles
+
+## A soft, additive pool of light that flickers.
+func _glow(centre: Vector2, radius: float, colour: Color, strength: float) -> void:
+	var gradient := Gradient.new()
+	gradient.colors = PackedColorArray([colour, Color(colour, 0.0)])
+	var tex := GradientTexture2D.new()
+	tex.gradient = gradient
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5)
+	tex.width = 128
+	tex.height = 128
+	var light := TextureRect.new()
+	light.texture = tex
+	light.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	light.size = Vector2(radius, radius) * 2.0
+	light.position = centre - Vector2(radius, radius)
+	light.pivot_offset = Vector2(radius, radius)
+	light.modulate.a = strength
+	var additive := CanvasItemMaterial.new()
+	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	light.material = additive
+	light.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stage.add_child(light)
+	_glows.append({"node": light, "base_alpha": strength, "phase": _rng.randf() * TAU})
+
+func _build_ambience() -> void:
+	_rng.seed = 7
+	var w := design_size.x
+	# Stone walls (overshooting the stage so wide windows stay covered) and a flagstone floor.
+	_tiled("res://static/winery/stone_wall.png", Rect2(-640, -360, w + 1280, design_size.y + 720), 4.0, wall_tint)
+	_tiled("res://static/winery/flagstones.png", Rect2(-640, 500, w + 1280, 520), 4.0, Color(0.8, 0.74, 0.7))
+	var skirting := ColorRect.new()
+	skirting.color = Color8(46, 34, 30)
+	skirting.position = Vector2(-640, 496)
+	skirting.size = Vector2(w + 1280, 8)
+	skirting.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stage.add_child(skirting)
+
+	# Window high on the left with a dusty shaft of daylight falling across the room.
+	_deco("res://static/winery/window.png", Vector2(10, 84), 4.0)
+	var shaft := Polygon2D.new()
+	shaft.polygon = PackedVector2Array([Vector2(18, 150), Vector2(86, 150), Vector2(470, 500), Vector2(240, 500)])
+	shaft.color = Color(1.0, 0.96, 0.82, 0.11)
+	_stage.add_child(shaft)
+	for i in 16:
+		var mote := ColorRect.new()
+		mote.color = Color(1.0, 0.95, 0.8, 0.0)
+		mote.size = Vector2(4, 4)
+		mote.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_stage.add_child(mote)
+		var t := _rng.randf()
+		var origin := Vector2(lerpf(52.0, 355.0, t) + _rng.randf_range(-50, 50), lerpf(170.0, 480.0, t))
+		_motes.append({"node": mote, "origin": origin, "phase": _rng.randf() * TAU, "speed": _rng.randf_range(0.2, 0.5)})
+
+	# A wine rack along the left wall, and a little stack of barrels with a sleeping cat.
+	_deco("res://static/winery/wine_rack.png", Vector2(-24, 324), 4.0)
+	for spot in [Vector2(440, 442), Vector2(498, 442), Vector2(469, 386)]:
+		_deco("res://static/winery/barrel_end.png", spot, 2.4)
+	_cat = _deco("res://static/winery/cat_0.png", Vector2(471, 356), 3.0)
+	_candle = _deco("res://static/winery/candle_0.png", Vector2(530, 540), 3.0)
+
+	# Cobwebs in the top corners, under the beams.
+	_deco("res://static/winery/cobweb.png", Vector2(0, 50), 4.0)
+	var web := _deco("res://static/winery/cobweb.png", Vector2(w, 50), 4.0)
+	web.flip_h = true
+	web.position.x = w - web.size.x
+
+	# Ceiling beams with a lantern hanging over the barrel stack.
+	_tiled("res://static/shop/beam.png", Rect2(-640, 0, w + 1280, 50), 5.0)
+	var rope := ColorRect.new()
+	rope.color = Color8(60, 44, 34)
+	rope.position = Vector2(496, 50)
+	rope.size = Vector2(4, 30)
+	rope.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stage.add_child(rope)
+	_deco("res://static/shop/lantern.png", Vector2(474, 78), 4.0)
+	_glow(Vector2(498, 140), 260.0, Color(1.0, 0.72, 0.36), 0.32)
+	_glow(Vector2(542, 548), 110.0, Color(1.0, 0.66, 0.3), 0.3)
+
+	# Darken the edges so the eye settles on the barrel.
+	var gradient := Gradient.new()
+	gradient.colors = PackedColorArray([Color(0, 0, 0, 0), Color(0.04, 0.02, 0.02, 0.6)])
+	gradient.offsets = PackedFloat32Array([0.45, 1.0])
+	var vignette_tex := GradientTexture2D.new()
+	vignette_tex.gradient = gradient
+	vignette_tex.fill = GradientTexture2D.FILL_RADIAL
+	vignette_tex.fill_from = Vector2(0.5, 0.5)
+	vignette_tex.fill_to = Vector2(1.05, 0.5)
+	var vignette := TextureRect.new()
+	vignette.texture = vignette_tex
+	vignette.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	vignette.position = Vector2(-120, -80)
+	vignette.size = design_size + Vector2(240, 160)
+	vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stage.add_child(vignette)
+
+func _animate_ambience(delta: float) -> void:
+	var t := Time.get_ticks_msec() / 1000.0
+	for g in _glows:
+		var node: TextureRect = g.node
+		var flicker: float = sin(t * 7.3 + g.phase) * 0.5 + sin(t * 13.1 + g.phase * 2.0) * 0.3 + sin(t * 2.1) * 0.2
+		node.modulate.a = g.base_alpha * (0.86 + flicker * 0.12)
+		node.scale = Vector2.ONE * (1.0 + flicker * 0.02)
+	for m in _motes:
+		var node: ColorRect = m.node
+		var a: float = t * m.speed + m.phase
+		node.position = m.origin + Vector2(sin(a) * 18.0, sin(a * 0.7) * 26.0 - fmod(t * 6.0 * m.speed, 30.0))
+		node.color.a = 0.25 + 0.25 * sin(a * 1.7)
+	_cat.texture = load("res://static/winery/cat_%d.png" % (int(t / 1.4) % 2))
+	_candle.texture = load("res://static/winery/candle_%d.png" % (int(t * 6.0) % 2))
+
+	# Fermenting: bubbles drift up off the barrel, and it gives the odd gurgle.
+	if Winery.state != Winery.State.FERMENTING:
+		return
+	_bubble_left -= delta
+	if _bubble_left <= 0.0:
+		_bubble_left = _rng.randf_range(0.12, 0.35)
+		_spawn_bubble()
+	_gurgle_left -= delta
+	if _gurgle_left <= 0.0:
+		_gurgle_left = _rng.randf_range(1.8, 3.5)
+		var tween := create_tween()
+		tween.tween_property(_barrel, "scale", Vector2(1.015, 0.985), 0.1)
+		tween.tween_property(_barrel, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_SINE)
+
+func _spawn_bubble() -> void:
+	var bubble := TextureRect.new()
+	bubble.texture = load("res://static/winery/bubble.png")
+	bubble.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	var size := _rng.randf_range(10, 18)
+	bubble.size = Vector2(size, size)
+	bubble.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var start := barrel_origin + Vector2(_barrel.size.x * 0.5 + _rng.randf_range(-110, 110), 20)
+	bubble.position = start
+	_stage.add_child(bubble)
+	var rise := _rng.randf_range(60, 120)
+	var tween := bubble.create_tween().set_parallel(true)
+	tween.tween_property(bubble, "position", start + Vector2(_rng.randf_range(-20, 20), -rise), 1.4).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(bubble, "modulate:a", 0.0, 0.6).set_delay(0.8)
+	tween.chain().tween_callback(bubble.queue_free)
 
 func _build_barrel() -> void:
 	_barrel = TextureRect.new()

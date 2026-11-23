@@ -340,6 +340,8 @@ func _make_shelf_item(item: ItemData) -> Control:
 	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(tag)
 	var price := _label("", 18, price_color, false)
+	# The theme gives every label a drop shadow; price tags read cleaner without.
+	price.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
 	price.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tag.add_child(price)
 	var tick := TextureRect.new()

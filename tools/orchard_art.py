@@ -615,7 +615,8 @@ def shovel():
     return p.outline()
 
 
-# The orchard keeper: a smiling blonde girl in a pink dress with a bow.
+# The orchard keeper: a smiling blonde girl in a pink dress with a bow. She holds
+# the boy's hand: her left arm reaches to the left edge, level with his hand.
 GIRL_PAL = {
     "o": (92, 46, 62),      # outline
     "H": (250, 212, 100),   # hair
@@ -650,10 +651,10 @@ GIRL = [
     ".oHHHdSSSSSdHHHo",
     "..oHHHoWWWoHHHo.",
     "..oHHoPWLWPoHHo.",
-    "...ooPPLLLPPoo..",
-    "...oSPPPPPPPSo..",
-    "...oSPPPPPPPSo..",
-    "....oPPPPPPPo...",
+    "oooooPPLLLPPoo..",
+    "SSSSSPPPPPPPSo..",
+    "SSooSPPPPPPPSo..",
+    "oo..oPPPPPPPo...",
     "...oPPLPPPLPPo..",
     "..oPPPPPPPPPPPo.",
     "..opPpPpPpPpPpo.",
@@ -678,7 +679,8 @@ def girl(blink):
     return p
 
 
-# Her friend: a taller smiling brunette boy in a blonde cap and blue overalls.
+# Her friend: a taller smiling brunette boy in a blonde cap and blue overalls,
+# his right hand reaching to the right edge to hold hers.
 BOY_PAL = {
     "o": (62, 40, 46),      # outline
     "Y": (250, 212, 100),   # cap
@@ -720,10 +722,10 @@ BOY = [
     ".oTTUTTTTTTUTTo.",
     ".oTTUlTTTTlUTTo.",
     ".oToUUUUUUUUoTo.",
-    ".oSoUUnUUnUUoSo.",
-    ".oSoUUUUUUUUoSo.",
-    "..o.UlUUUUlU.o..",
-    "...oUUUUUUUUo...",
+    ".oSoUUnUUnUUoTSo",
+    ".oSoUUUUUUUUooSS",
+    "..o.UlUUUUlU.oSS",
+    "...oUUUUUUUUo.oo",
     "...oUUUUUUUUo...",
     "...oUUUooUUUo...",
     "...oUUUooUUUo...",

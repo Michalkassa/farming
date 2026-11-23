@@ -3,10 +3,10 @@ extends CanvasLayer
 ## Three rows of plots (trees at the back, vines on trellises, bushes in front)
 ## sit in a little fenced meadow under a blue sky with drifting clouds, with a
 ## shed (with a smiling girl in pink and her taller friend in a blonde cap
-## standing in front of it), a pond, a few flowers and butterflies.
+## standing hand in hand in front of it), a pond, a few flowers and butterflies.
 ##   Empty plot: click to pick a sapling to buy and plant.
 ##   Fruiting plant (sparkling): click to pick the fruit into your bags.
-##   Holding the shovel: click a plant to dig it up and free the plot.
+##   Holding the shovel: click a plant, confirm, and it's dug up to free the plot.
 ## It sits under the HUD layer so the hotbar stays visible while you pick.
 ## The scene is drawn on a fixed design stage scaled to cover the window; the
 ## buttons and the sapling picker sit on a separate stage scaled to fit.
@@ -227,9 +227,11 @@ func _build_ground() -> void:
 
 	# The shed and wheelbarrow on the right; the pond below them.
 	_planted(_stage, "shed", Vector2(1056, 300))
-	# The orchard keepers, smiling in front of the shed. Click one for a hop and a heart.
+	# The orchard keepers, hand in hand in front of the shed. They stand exactly
+	# side by side (both sprites are 16 art pixels wide) so their hands meet.
+	# Click either one and they hop together, with a heart.
 	for keeper in [{"art": "boy", "foot": Vector2(990, 324), "phase": 1.6},
-			{"art": "girl", "foot": Vector2(1040, 322), "phase": 0.0}]:
+			{"art": "girl", "foot": Vector2(990 + 16 * S, 324), "phase": 0.0}]:
 		var node := _planted(_stage, keeper.art + "_0", keeper.foot)
 		node.mouse_filter = Control.MOUSE_FILTER_STOP
 		node.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -328,7 +330,7 @@ func _process(delta: float) -> void:
 		var node: TextureRect = keeper.node
 		var hop: Tween = keeper.hop
 		if not (hop and hop.is_running()):
-			node.scale = Vector2(1.0, 1.0 + sin(t * 2.4 + keeper.phase) * 0.015)
+			node.scale = Vector2(1.0, 1.0 + sin(t * 2.4) * 0.015)   # in step, so the hands stay joined
 		node.texture = _tex(keeper.art + ("_1" if fmod(t + keeper.phase, 3.7) < 0.14 else "_0"))
 	for cloud in _clouds:
 		var node: TextureRect = cloud.node
@@ -416,7 +418,7 @@ func _on_plot_input(event: InputEvent, index: int) -> void:
 	_plots[index].accept_event()
 	var stage := Orchard.stage(index)
 	if stage >= 0 and _holding_shovel():
-		_dig(index)
+		_confirm_dig(index)
 		return
 	if stage < 0:
 		_open_picker(index)
@@ -470,9 +472,10 @@ func _dig(index: int) -> void:
 
 # --- Sapling picker -----------------------------------------------------------
 
-func _open_picker(index: int) -> void:
+## Opens a centred window over a dimmed screen (above the HUD) and returns its
+## content box. Clicking outside it or pressing Esc closes it.
+func _open_modal() -> VBoxContainer:
 	_close_picker()
-	var kind: StringName = Orchard.row_of(index)
 	_picker = Control.new()
 	_picker.size = design_size
 	_picker_root.add_child(_picker)
@@ -485,7 +488,6 @@ func _open_picker(index: int) -> void:
 		if e is InputEventMouseButton and e.pressed:
 			_close_picker())
 	_picker.add_child(dim)
-
 	var centre := CenterContainer.new()
 	centre.size = design_size
 	centre.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -496,6 +498,55 @@ func _open_picker(index: int) -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
 	panel.add_child(box)
+	_picker.modulate.a = 0.0
+	create_tween().tween_property(_picker, "modulate:a", 1.0, 0.15)
+	return box
+
+## "Dig up the Apple?" with the plant's icon, a red Dig up button and Keep.
+func _confirm_dig(index: int) -> void:
+	var plant_id: StringName = Orchard.plots[index].plant
+	var item: ItemData = ItemDatabase.get_item(plant_id)
+	var box := _open_modal()
+	box.add_theme_constant_override("separation", 14)
+	var icon := TextureRect.new()
+	icon.texture = item.icon if item else null
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2(0, 64)
+	box.add_child(icon)
+	var title := Label.new()
+	title.text = "Dig up the %s?" % (item.display_name if item else "plant")
+	title.add_theme_font_size_override("font_size", 27)
+	title.add_theme_color_override("font_color", gold_color)
+	title.add_theme_color_override("font_outline_color", Color8(46, 26, 18))
+	title.add_theme_constant_override("outline_size", 6)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	var buttons := HBoxContainer.new()
+	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	buttons.add_theme_constant_override("separation", 16)
+	box.add_child(buttons)
+	var dig := Button.new()
+	dig.text = "Dig up"
+	dig.theme_type_variation = &"DangerButton"
+	dig.focus_mode = Control.FOCUS_NONE
+	dig.custom_minimum_size = Vector2(160, 52)
+	dig.add_theme_font_size_override("font_size", 18)
+	dig.pressed.connect(func():
+		_close_picker()
+		_dig(index))
+	buttons.add_child(dig)
+	var keep := Button.new()
+	keep.text = "Keep"
+	keep.focus_mode = Control.FOCUS_NONE
+	keep.custom_minimum_size = Vector2(160, 52)
+	keep.add_theme_font_size_override("font_size", 18)
+	keep.pressed.connect(_close_picker)
+	buttons.add_child(keep)
+
+func _open_picker(index: int) -> void:
+	var kind: StringName = Orchard.row_of(index)
+	var box := _open_modal()
 	var title := Label.new()
 	title.text = {&"tree": "Plant a tree", &"vine": "Plant a vine", &"bush": "Plant a bush"}[kind]
 	title.add_theme_font_size_override("font_size", 27)
@@ -517,8 +568,6 @@ func _open_picker(index: int) -> void:
 	cancel.add_theme_font_size_override("font_size", 18)
 	cancel.pressed.connect(_close_picker)
 	box.add_child(cancel)
-	_picker.modulate.a = 0.0
-	create_tween().tween_property(_picker, "modulate:a", 1.0, 0.15)
 
 func _sapling_card(index: int, id: StringName) -> Control:
 	var item: ItemData = ItemDatabase.get_item(id)
@@ -567,19 +616,25 @@ func _close_picker() -> void:
 func _on_keeper_input(event: InputEvent, index: int) -> void:
 	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 		return
-	var keeper: Dictionary = _keepers[index]
-	var node: TextureRect = keeper.node
-	node.accept_event()
-	var running: Tween = keeper.hop
-	if running and running.is_running():
-		return
-	var rest_y: float = keeper.foot.y - node.size.y
-	node.scale = Vector2.ONE
-	var hop := create_tween()
-	hop.tween_property(node, "position:y", rest_y - 24, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	hop.tween_property(node, "position:y", rest_y, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	keeper["hop"] = hop
-	var heart := _sprite(_stage, "heart", node.position + Vector2(node.size.x * 0.5 - 13, -30), 3.0)
+	var clicked: TextureRect = _keepers[index].node
+	clicked.accept_event()
+	for keeper in _keepers:
+		var running: Tween = keeper.hop
+		if running and running.is_running():
+			return
+	# They're holding hands, so they hop together.
+	for keeper in _keepers:
+		var node: TextureRect = keeper.node
+		var rest_y: float = keeper.foot.y - node.size.y
+		node.scale = Vector2.ONE
+		var hop := create_tween()
+		hop.tween_property(node, "position:y", rest_y - 24, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		hop.tween_property(node, "position:y", rest_y, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		keeper["hop"] = hop
+	var left: TextureRect = _keepers[0].node
+	var right: TextureRect = _keepers[_keepers.size() - 1].node
+	var between := Vector2((left.position.x + right.position.x + right.size.x) * 0.5, minf(left.position.y, right.position.y))
+	var heart := _sprite(_stage, "heart", between + Vector2(-13, -30), 3.0)
 	heart.pivot_offset = heart.size * 0.5
 	heart.scale = Vector2(0.3, 0.3)
 	var float_up := heart.create_tween().set_parallel(true)

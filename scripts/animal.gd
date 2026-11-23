@@ -6,8 +6,9 @@ extends Node2D
 @export_group("Waiting Product")
 ## How high above the head the waiting product floats, and how much it bobs.
 @export var bubble_offset: float = 4.0
-@export var bubble_bob: float = 1.5
-@export var bubble_bob_speed: float = 2.2
+@export var bubble_bob: float = 2.0
+## Bobs per second. Kept very slow so the farm feels calm.
+@export var bubble_bob_speed: float = 0.22
 
 ## Twinkles around an animal that has something ready to collect.
 @export var sparkle_texture: Texture2D = preload("res://static/orchard/sparkle.png")
@@ -29,6 +30,8 @@ var _waiting: StringName = &""
 var _bubble: Sprite2D
 var _sparkles: Array[Sprite2D] = []
 var _hovered := false
+## Each animal bobs and twinkles on its own clock, so they never move in step.
+var _phase: float = randf() * TAU
 
 func kind() -> StringName:
 	return config.kind if config else &""
@@ -72,9 +75,9 @@ func _play(anim: String) -> void:
 func _process(delta: float) -> void:
 	if _bubble and _bubble.visible:
 		var t := Time.get_ticks_msec() / 1000.0
-		_bubble.position.y = _bubble_rest_y() + roundf(sin(t * bubble_bob_speed * TAU) * bubble_bob)
+		_bubble.position.y = _bubble_rest_y() + roundf(sin(t * bubble_bob_speed * TAU + _phase) * bubble_bob)
 		for i in _sparkles.size():
-			var pulse := 0.5 + 0.5 * sin(t * 3.2 + i * 2.1)
+			var pulse := 0.5 + 0.5 * sin(t * 1.1 + i * 2.1 + _phase)
 			_sparkles[i].scale = Vector2.ONE * (0.35 + pulse * 0.65)
 			_sparkles[i].modulate.a = pulse
 	if config == null or config.roam.size == Vector2.ZERO:

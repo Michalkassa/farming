@@ -22,7 +22,6 @@ const BLURBS := {
 	&"wheat": "Wine helper: feeds the yeast",
 	&"corn": "Wine helper: lots of sugar",
 	&"carrot": "Wine helper: growth & rain",
-	&"wild_yeast": "Makes wine. Unpredictable!",
 	&"golden_apple": "A rare, magical fruit",
 }
 
@@ -37,7 +36,7 @@ static func blurb(item: ItemData) -> String:
 		var crop: ItemData = ItemDatabase.get_item(item.seed_for)
 		return "Plant to grow %s" % PLURALS.get(item.seed_for, crop.display_name.to_lower() if crop else "crops")
 	if Brewing.YEASTS.has(item.id):
-		return "Turns fruit into wine"
+		return "Starts fermentation"
 	if item.is_tool():
 		var size := " (%d×%d)" % [item.tool_area, item.tool_area] if item.tool_area > 1 else ""
 		match item.tool_kind:

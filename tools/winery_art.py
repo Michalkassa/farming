@@ -30,6 +30,12 @@ class Px:
                 if (x - cx) ** 2 + (y - cy) ** 2 <= r * r + 0.5:
                     self.put(x, y, c)
 
+    def ellipse(self, cx, cy, rx, ry, c):
+        for y in range(self.h):
+            for x in range(self.w):
+                if ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1.0:
+                    self.put(x, y, c)
+
     def line(self, x0, y0, x1, y1, c):
         n = max(abs(x1 - x0), abs(y1 - y0), 1)
         for i in range(n + 1):
@@ -150,6 +156,162 @@ def barrel():
     return p.outline()
 
 
+# ---------------------------------------------------------------- cellar ambience
+STONE, STONE_D, STONE_L, MORTAR = (112, 98, 92), (84, 72, 70), (140, 126, 116), (58, 48, 48)
+
+
+def stone_wall():
+    """Tileable cellar stonework: staggered blocks with dark mortar."""
+    p = Px()
+    p.rect(0, 0, 15, 15, MORTAR)
+    blocks = ((0, 0, 7, 3), (9, 0, 15, 3), (0, 5, 3, 9), (5, 5, 12, 9), (14, 5, 15, 9), (0, 11, 6, 15), (8, 11, 15, 15))
+    for i, (x0, y0, x1, y1) in enumerate(blocks):
+        c = (STONE, shade(STONE, -0.06), shade(STONE, 0.05))[i % 3]
+        p.rect(x0, y0, x1, y1 - 1, c)
+        p.rect(x0, y0, x1, y0, STONE_L)
+        p.rect(x0, y1 - 1, x1, y1 - 1, STONE_D)
+    for x, y in ((3, 2), (11, 1), (8, 7), (2, 13), (12, 13)):
+        p.put(x, y, STONE_D)
+    return p
+
+
+def flagstones():
+    p = Px()
+    floor, floor_d, floor_l = (92, 78, 70), (66, 54, 50), (114, 98, 88)
+    p.rect(0, 0, 15, 15, floor_d)
+    for x0, y0, x1, y1 in ((0, 0, 9, 6), (11, 0, 15, 6), (0, 8, 4, 15), (6, 8, 15, 15)):
+        p.rect(x0, y0, x1, y1 - 1, floor)
+        p.rect(x0, y0, x1, y0, floor_l)
+    return p
+
+
+def wine_rack():
+    """A wooden rack of bottle ends: glass circles with coloured foil."""
+    w, h = 34, 44
+    p = Px(w, h)
+    wood, wood_d, wood_l = (120, 74, 42), (84, 50, 28), (156, 102, 60)
+    p.rect(0, 0, w - 1, h - 1, wood_d)
+    p.rect(1, 1, w - 2, 2, wood_l)
+    p.rect(1, h - 3, w - 2, h - 2, wood)
+    foils = [(196, 40, 70), (230, 190, 60), (120, 60, 160), (196, 40, 70), (60, 140, 90), (230, 190, 60)]
+    i = 0
+    for row in range(5):
+        for col in range(4):
+            cx, cy = 5 + col * 8, 6 + row * 8
+            p.disc(cx, cy, 3, (30, 50, 40))
+            p.disc(cx, cy, 1.5, foils[i % len(foils)])
+            p.put(cx - 1, cy - 1, (180, 220, 200))
+            i += 1
+    for x in (0, w - 1):
+        p.rect(x, 0, x, h - 1, wood)
+    return p.outline()
+
+
+def barrel_end():
+    """A barrel lying on its side, seen end-on: hooped round face."""
+    p = Px(24, 24)
+    wood, wood_d, wood_l = (150, 96, 52), (104, 64, 34), (186, 128, 74)
+    p.disc(11.5, 11.5, 11, (88, 88, 96))                 # outer hoop
+    p.disc(11.5, 11.5, 9.5, wood)
+    for x in range(3, 21, 4):
+        p.line(x, 3, x, 20, wood_d)
+    p.disc(11.5, 11.5, 2, wood_d)                        # bung
+    p.disc(11, 11, 1, wood_l)
+    for x, y in ((6, 5), (16, 6), (5, 15)):
+        p.put(x, y, wood_l)
+    return p.outline()
+
+
+def cobweb():
+    p = Px()
+    web = (220, 220, 230)
+    for i in range(0, 16, 1):
+        if i < 15:
+            p.put(i, 0, web) if i % 2 == 0 else None
+    p.line(0, 0, 15, 15, web)
+    p.line(0, 0, 7, 15, web)
+    p.line(0, 0, 15, 7, web)
+    for r in (5, 9, 13):
+        for t in range(0, r + 1):
+            x, y = t, r - t
+            if (x + y) % 2 == 0:
+                p.put(x, y, web)
+    return p
+
+
+def window():
+    """A small arched cellar window with soft daylight and bars."""
+    p = Px(20, 18)
+    light, light_l = (170, 210, 235), (215, 236, 248)
+    p.rect(2, 6, 17, 17, light)
+    p.disc(9.5, 7, 7.5, light)
+    for (x, y) in list(p.g):
+        if y > 17:
+            del p.g[(x, y)]
+    p.rect(4, 4, 8, 9, light_l)
+    for x in (6, 10, 14):
+        p.rect(x, 0, x, 17, (60, 56, 60))
+    p.rect(2, 11, 17, 11, (60, 56, 60))
+    return p.outline((58, 48, 48))
+
+
+def cat(frame):
+    """A ginger cat curled up asleep; frame 1 breathes in and flicks the tail."""
+    p = Px(18, 11)
+    fur, fur_d, fur_l = (236, 150, 70), (196, 108, 46), (255, 196, 130)
+    p.ellipse(9, 7 - (1 if frame else 0) * 0.5, 7.5, 3.6 + 0.4 * frame, fur)
+    p.disc(4, 6, 3, fur)                                   # head
+    p.put(2, 3, fur); p.put(3, 3, fur_d)                   # ears
+    p.put(5, 3, fur); p.put(6, 3, fur_d)
+    for x in (8, 11, 14):
+        p.line(x, 4, x, 6, fur_d)                          # stripes
+    p.put(3, 6, (60, 40, 40)); p.put(5, 6, (60, 40, 40))   # closed eyes
+    p.put(4, 7, (240, 130, 150))                           # nose
+    tail_tip = (17, 4) if frame else (16, 9)
+    p.line(15, 8, tail_tip[0], tail_tip[1], fur_d)
+    p.rect(6, 5, 12, 5, fur_l)
+    return p.outline((92, 52, 36))
+
+
+def candle(frame):
+    p = Px(8, 16)
+    wax, wax_d = (248, 236, 210), (220, 200, 170)
+    p.rect(2, 7, 5, 15, wax)
+    p.rect(5, 7, 5, 15, wax_d)
+    p.put(2, 8, wax_d)
+    p.put(3, 6, (60, 50, 40))                              # wick
+    flame = ((3, 1), (3, 2), (2, 3), (3, 3), (4, 3), (3, 4), (2, 4), (4, 4), (3, 5)) if frame == 0 \
+        else ((4, 1), (3, 2), (4, 2), (2, 3), (3, 3), (4, 3), (3, 4), (2, 4), (4, 4), (3, 5))
+    for x, y in flame:
+        p.put(x, y, (255, 180, 60))
+    p.put(3, 4, (255, 240, 170))
+    p.put(3, 3, (255, 240, 170))
+    return p.outline((92, 60, 40))
+
+
+def bubble():
+    p = Px(5, 5)
+    p.disc(2, 2, 2, (220, 160, 190))
+    p.disc(2, 2, 1, (120, 40, 70))
+    p.put(1, 1, (255, 235, 245))
+    return p
+
+
+def ambience():
+    out = ROOT / "static/winery"
+    stone_wall().save(out / "stone_wall.png")
+    flagstones().save(out / "flagstones.png")
+    wine_rack().save(out / "wine_rack.png")
+    barrel_end().save(out / "barrel_end.png")
+    cobweb().save(out / "cobweb.png")
+    window().save(out / "window.png")
+    cat(0).save(out / "cat_0.png")
+    cat(1).save(out / "cat_1.png")
+    candle(0).save(out / "candle_0.png")
+    candle(1).save(out / "candle_1.png")
+    bubble().save(out / "bubble.png")
+
+
 def main():
     items = ROOT / "static/items"
     for name, colour in YEASTS.items():
@@ -157,6 +319,7 @@ def main():
     for name, colour in BOTTLES.items():
         bottle(colour).save(ROOT / "static/winery" / f"bottle_{name}.png")
     barrel().save(ROOT / "static/winery/barrel.png")
+    ambience()
     print("wrote", len(YEASTS) + len(BOTTLES) + 1, "sprites")
 
 
