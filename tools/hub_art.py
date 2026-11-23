@@ -214,6 +214,29 @@ def hub_stall():
     return c
 
 
+def coin_stack():
+    """A little stack of gold coins, for the shop's sell-everything button."""
+    c = Canvas(16, 16)
+    gold, gold_dk, gold_lt = (250, 200, 60), (196, 140, 30), (255, 236, 150)
+    for i, (cx, cy) in enumerate(((8, 12), (8, 9), (8, 6))):
+        c.ellipse(cx, cy, 5.5, 2.5, gold)
+        c.rect(cx - 5, cy, cx + 5, cy + 1, gold_dk)
+        c.ellipse(cx, cy - 0.5, 4, 1.5, gold_lt)
+    c.rect(7, 5, 8, 5, gold_dk)
+    c.outline()
+    return c
+
+
+def check_mark():
+    """A green tick for things you already own."""
+    c = Canvas(11, 9)
+    green = (90, 190, 70)
+    for x, y in ((1, 4), (2, 5), (3, 6), (4, 5), (5, 4), (6, 3), (7, 2), (8, 1)):
+        c.rect(x, y, x + 1, y + 1, green)
+    c.outline((30, 70, 30))
+    return c
+
+
 class Scaled:
     """Draws on a Canvas in coordinates of a smaller design, scaled by k, so
     the art can be redrawn larger with crisp 1px outlines instead of being
@@ -571,6 +594,8 @@ def main():
     post().save("post.png")
     shelf().save("shelf.png")
     hub_stall().save("hub_stall.png")
+    coin_stack().save("coin.png")
+    check_mark().save("check.png")
     print("wrote stall art to", OUT)
 
 
