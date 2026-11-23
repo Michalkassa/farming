@@ -678,6 +678,76 @@ def girl(blink):
     return p
 
 
+# Her friend: a taller smiling brunette boy in a blonde cap and blue overalls.
+BOY_PAL = {
+    "o": (62, 40, 46),      # outline
+    "Y": (250, 212, 100),   # cap
+    "c": (255, 240, 165),   # cap shine
+    "y": (214, 160, 58),    # cap brim
+    "R": (128, 76, 42),     # hair
+    "r": (92, 52, 30),      # hair shade
+    "h": (170, 112, 64),    # hair shine
+    "S": (255, 220, 190),   # skin
+    "s": (240, 184, 156),   # skin shade
+    "C": (255, 152, 168),   # rosy cheeks
+    "E": (58, 38, 50),      # eyes
+    "e": (255, 255, 255),   # eye sparkle
+    "M": (200, 82, 100),    # smile
+    "T": (255, 244, 222),   # shirt
+    "U": (112, 164, 232),   # overalls
+    "u": (80, 122, 200),    # overalls shade
+    "l": (166, 204, 250),   # overalls light
+    "n": (255, 214, 90),    # buttons
+    "K": (140, 84, 52),     # shoes
+}
+BOY = [
+    ".....oooooo.....",
+    "...ooYYcYYYoo...",
+    "..oYYccYYYYYYo..",
+    "..oYYcYYYYYYYo..",
+    ".oyyyyyyyyyyyyo.",
+    ".oRRhRRRRRRhRRo.",
+    ".oRrSSSSSSSSrRo.",
+    ".oRSSSSSSSSSSRo.",
+    ".oRSEESSSSEESRo.",
+    ".oRSEeSSSSEeSRo.",
+    ".oRCSMSSSSMSCRo.",
+    ".oRSSSMMMMSSSRo.",
+    "..oRSSSSSSSSRo..",
+    "...ooSSSSSSoo...",
+    "....osSSSSso....",
+    "..ooTTTTTTTToo..",
+    ".oTTUTTTTTTUTTo.",
+    ".oTTUlTTTTlUTTo.",
+    ".oToUUUUUUUUoTo.",
+    ".oSoUUnUUnUUoSo.",
+    ".oSoUUUUUUUUoSo.",
+    "..o.UlUUUUlU.o..",
+    "...oUUUUUUUUo...",
+    "...oUUUUUUUUo...",
+    "...oUUUooUUUo...",
+    "...oUUUooUUUo...",
+    "...ouuuo.ouuuo..",
+    "....oSo...oSo...",
+    "....oSo...oSo...",
+    "...oKKKo.oKKKo..",
+    "...ooooo.ooooo..",
+]
+
+
+def boy(blink):
+    rows = list(BOY)
+    if blink:
+        rows[8] = ".oRSSSSSSSSSSRo."
+        rows[9] = ".oRSEESSSSEESRo."
+    p = Px(16, len(rows))
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row[:16]):
+            if ch != ".":
+                p.put(x, y, BOY_PAL[ch])
+    return p
+
+
 def heart():
     p = Px(9, 8)
     rows = [".oo...oo.", "oHHo.oHHo", "oHhHoHHHo", "oHHHHHHHo", ".oHHHHHo.", "..oHHHo..", "...oHo...", "....o...."]
@@ -709,6 +779,8 @@ def decor():
     girl(False).save(OUT / "girl_0.png")
     girl(True).save(OUT / "girl_1.png")
     heart().save(OUT / "heart.png")
+    boy(False).save(OUT / "boy_0.png")
+    boy(True).save(OUT / "boy_1.png")
 
 
 def main():
