@@ -9,6 +9,10 @@ extends Node2D
 @export var bubble_bob: float = 1.5
 @export var bubble_bob_speed: float = 2.2
 
+## Twinkles around an animal that has something ready to collect.
+@export var sparkle_texture: Texture2D = preload("res://static/orchard/sparkle.png")
+@export var sparkle_count: int = 3
+
 @export_group("Produce Popup")
 @export var popup_rise: float = 12.0
 @export var popup_duration: float = 1.1
@@ -23,6 +27,7 @@ var _pause_left: float = 0.0
 ## The product this animal is holding out, waiting to be clicked (&"" if none).
 var _waiting: StringName = &""
 var _bubble: Sprite2D
+var _sparkles: Array[Sprite2D] = []
 var _hovered := false
 
 func kind() -> StringName:
@@ -68,6 +73,10 @@ func _process(delta: float) -> void:
 	if _bubble and _bubble.visible:
 		var t := Time.get_ticks_msec() / 1000.0
 		_bubble.position.y = _bubble_rest_y() + roundf(sin(t * bubble_bob_speed * TAU) * bubble_bob)
+		for i in _sparkles.size():
+			var pulse := 0.5 + 0.5 * sin(t * 3.2 + i * 2.1)
+			_sparkles[i].scale = Vector2.ONE * (0.35 + pulse * 0.65)
+			_sparkles[i].modulate.a = pulse
 	if config == null or config.roam.size == Vector2.ZERO:
 		return
 	if _pause_left > 0.0:
@@ -118,7 +127,12 @@ func _room_at(spot: Vector2) -> float:
 	return nearest
 
 ## The product appears over the animal's head and waits there to be clicked.
+## Nothing more is made until it's collected (the timer is one-shot and only
+## restarts in collect()).
 func _on_produce() -> void:
+	if _waiting != &"":
+		return
+	_timer.stop()
 	var item: ItemData = ItemDatabase.get_item(config.kind)
 	if item == null:
 		return
@@ -134,9 +148,27 @@ func _on_produce() -> void:
 	_bubble.texture = product.icon
 	_bubble.position = Vector2(0, _bubble_rest_y())
 	_bubble.visible = true
+	_set_sparkles(true)
 	_bubble.scale = Vector2(0.2, 0.2)
 	create_tween().tween_property(_bubble, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_update_cursor()
+
+## Little stars twinkling around the animal while its product waits.
+func _set_sparkles(on: bool) -> void:
+	if on and _sparkles.is_empty() and sparkle_texture:
+		var head: Texture2D = _sprite.sprite_frames.get_frame_texture("idle", 0)
+		var size: Vector2 = head.get_size() if head else Vector2(16, 16)
+		var spots := [Vector2(-0.55, -0.85), Vector2(0.6, -0.55), Vector2(-0.4, -0.2), Vector2(0.45, -1.0)]
+		for i in sparkle_count:
+			var star := Sprite2D.new()
+			star.texture = sparkle_texture
+			star.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			star.z_index = 4
+			star.position = Vector2(spots[i % spots.size()].x * size.x, spots[i % spots.size()].y * size.y)
+			add_child(star)
+			_sparkles.append(star)
+	for star in _sparkles:
+		star.visible = on
 
 func _bubble_rest_y() -> float:
 	var head: Texture2D = _sprite.sprite_frames.get_frame_texture("idle", 0)
@@ -154,6 +186,7 @@ func collect() -> bool:
 		return false
 	GameState.collect_item(_waiting, 1, get_global_transform_with_canvas().origin)
 	_bubble.visible = false
+	_set_sparkles(false)
 	_show_product(_waiting)
 	_waiting = &""
 	_timer.start()
