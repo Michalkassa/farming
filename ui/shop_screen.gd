@@ -6,10 +6,12 @@ extends CanvasLayer
 ##     full pens show the count.
 ##   Counter: your produce, fruit and wine. Click one to sell one, right-click
 ##     to sell the whole stack, or press the coin button to sell everything.
-## Hovering anything shows its name. The layout is built in code on a fixed
-## design stage scaled to fit the window.
+## Hovering anything pops up a tiny info block: its name and one short line on
+## what it's for. The layout is built in code on a fixed design stage scaled to
+## fit the window. Text sizes are multiples of 9 so the pixel font stays crisp.
 
 const Brewing := preload("res://scripts/brewing.gd")
+const ItemInfo := preload("res://scripts/item_info.gd")
 const ART := "res://static/shop/%s.png"
 const PX := 5.0                                 # stall art pixels -> design pixels
 
@@ -40,6 +42,10 @@ var _sell_row: HBoxContainer
 var _sell_all: Button
 var _money_label: Label
 var _fade: Tween
+var _info: PanelContainer
+var _info_name: Label
+var _info_line: Label
+var _info_target: Control
 
 func _ready() -> void:
 	layer = 20
@@ -68,6 +74,7 @@ func open() -> void:
 func close() -> void:
 	if not visible:
 		return
+	_info.visible = false
 	if _fade:
 		_fade.kill()
 	_fade = create_tween()
@@ -113,8 +120,11 @@ func _label(text: String, size: int, colour: Color, outline: bool = true) -> Lab
 	label.add_theme_font_size_override("font_size", size)
 	label.add_theme_color_override("font_color", colour)
 	if outline:
-		label.add_theme_color_override("font_outline_color", Color(0.1, 0.06, 0.03))
-		label.add_theme_constant_override("outline_size", 5)
+		label.add_theme_color_override("font_outline_color", Color8(46, 26, 18))
+		label.add_theme_constant_override("outline_size", 6)
+		label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.35))
+		label.add_theme_constant_override("shadow_offset_x", 2)
+		label.add_theme_constant_override("shadow_offset_y", 3)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label
 
@@ -187,7 +197,9 @@ func _build() -> void:
 	_sell_all.icon = load(ART % "coin")
 	_sell_all.expand_icon = true
 	_sell_all.add_theme_constant_override("icon_max_width", 44)
-	_sell_all.add_theme_font_size_override("font_size", 24)
+	_sell_all.add_theme_font_size_override("font_size", 27)
+	_sell_all.mouse_entered.connect(func(): _show_info(_sell_all, "Sell everything", "All your produce, fruit and wine"))
+	_sell_all.mouse_exited.connect(_hide_info.bind(_sell_all))
 	_sell_all.position = Vector2(w - 236, 498)
 	_sell_all.size = Vector2(196, sell_slot_size)
 	_sell_all.pressed.connect(_on_sell_all)
@@ -196,7 +208,7 @@ func _build() -> void:
 	var back := Button.new()
 	back.text = "<"
 	back.focus_mode = Control.FOCUS_NONE
-	back.add_theme_font_size_override("font_size", 24)
+	back.add_theme_font_size_override("font_size", 27)
 	back.position = Vector2(12, 30)
 	back.custom_minimum_size = Vector2(64, 52)
 	back.pressed.connect(close)
@@ -205,10 +217,66 @@ func _build() -> void:
 	money.theme_type_variation = &"Badge"
 	money.position = Vector2(w - 176, 32)
 	money.custom_minimum_size = Vector2(164, 48)
-	_money_label = _label("", 24, gold_color)
+	_money_label = _label("", 27, gold_color)
 	_money_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	money.add_child(_money_label)
 	_stage.add_child(money)
+	_build_info()
+
+## The little hover card: name in gold, one short line underneath.
+func _build_info() -> void:
+	_info = PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color8(46, 30, 22, 245)
+	style.border_color = Color8(214, 160, 90)
+	style.set_border_width_all(3)
+	style.set_corner_radius_all(4)
+	style.content_margin_left = 14
+	style.content_margin_right = 14
+	style.content_margin_top = 8
+	style.content_margin_bottom = 10
+	style.shadow_color = Color(0, 0, 0, 0.3)
+	style.shadow_size = 4
+	style.shadow_offset = Vector2(0, 3)
+	_info.add_theme_stylebox_override("panel", style)
+	_info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_info.visible = false
+	_info.z_index = 10
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 2)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_info.add_child(box)
+	_info_name = _label("", 18, gold_color)
+	box.add_child(_info_name)
+	_info_line = _label("", 18, Color8(255, 244, 222), false)
+	box.add_child(_info_line)
+	_stage.add_child(_info)
+
+## Pops the info card up just above `target` (or below, near the top edge).
+func _show_info(target: Control, title: String, line: String) -> void:
+	_info_target = target
+	_info_name.text = title
+	_info_line.text = line
+	_info_line.visible = line != ""
+	_info.visible = true
+	_info.reset_size()
+	var card := _info.get_combined_minimum_size()
+	var to_stage := _stage.get_global_transform().affine_inverse()
+	var rect := target.get_global_rect()
+	var top: Vector2 = to_stage * rect.position
+	var bottom: Vector2 = to_stage * rect.end
+	var x := clampf((top.x + bottom.x - card.x) * 0.5, 8.0, design_size.x - card.x - 8.0)
+	var y := top.y - card.y - 8.0
+	if y < 8.0:
+		y = bottom.y + 8.0
+	_info.position = Vector2(x, y).floor()
+	_info.modulate.a = 0.0
+	create_tween().tween_property(_info, "modulate:a", 1.0, 0.1)
+
+func _hide_info(target: Control) -> void:
+	if _info_target == target:
+		_info.visible = false
+		_info_target = null
 
 # --- Shelves ------------------------------------------------------------------
 
@@ -235,6 +303,8 @@ func _stock_shelves() -> void:
 		return
 	var rows := _shelf_contents()
 	for r in mini(rows.size(), _shelf_rows.size()):
+		# Roomy shelves get more space between goods, so big price tags don't touch.
+		_shelf_rows[r].add_theme_constant_override("separation", 4 if rows[r].size() > 9 else 26)
 		for item in rows[r]:
 			_shelf_rows[r].add_child(_make_shelf_item(item))
 
@@ -243,7 +313,6 @@ func _make_shelf_item(item: ItemData) -> Control:
 	root.custom_minimum_size = Vector2(shelf_icon_size + 16, shelf_icon_size + 40)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
 	root.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	root.tooltip_text = _item_name(item)
 	var icon := TextureRect.new()
 	icon.texture = item.icon
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -259,13 +328,18 @@ func _make_shelf_item(item: ItemData) -> Control:
 	tag_style.bg_color = tag_color
 	tag_style.set_border_width_all(2)
 	tag_style.border_color = Color8(92, 56, 36)
-	tag_style.set_content_margin_all(2)
-	tag_style.content_margin_left = 6
-	tag_style.content_margin_right = 6
+	tag_style.set_corner_radius_all(3)
+	tag_style.content_margin_top = 1
+	tag_style.content_margin_bottom = 2
+	tag_style.content_margin_left = 7
+	tag_style.content_margin_right = 7
+	tag_style.shadow_color = Color(0, 0, 0, 0.25)
+	tag_style.shadow_offset = Vector2(0, 2)
+	tag_style.shadow_size = 1
 	tag.add_theme_stylebox_override("panel", tag_style)
 	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(tag)
-	var price := _label("", 16, price_color, false)
+	var price := _label("", 18, price_color, false)
 	price.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tag.add_child(price)
 	var tick := TextureRect.new()
@@ -275,20 +349,22 @@ func _make_shelf_item(item: ItemData) -> Control:
 	tick.position = Vector2((shelf_icon_size + 16 - 33) * 0.5, shelf_icon_size + 8)
 	tick.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(tick)
-	var badge := _label("", 14, Color.WHITE)
-	badge.position = Vector2(shelf_icon_size - 20, -4)
+	var badge := _label("", 18, Color.WHITE)
+	badge.position = Vector2(shelf_icon_size - 18, shelf_icon_size - 26)
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(badge)
 	var entry := {"item": item, "root": root, "icon": icon, "tag": tag, "price": price, "tick": tick, "badge": badge}
 	root.gui_input.connect(_on_shelf_input.bind(entry))
-	root.mouse_entered.connect(func(): _lift(entry, true))
-	root.mouse_exited.connect(func(): _lift(entry, false))
+	root.mouse_entered.connect(func():
+		_lift(entry, true)
+		_show_info(root, _item_name(item), ItemInfo.blurb(item)))
+	root.mouse_exited.connect(func():
+		_lift(entry, false)
+		_hide_info(root))
 	_shelf_items.append(entry)
 	return root
 
 func _item_name(item: ItemData) -> String:
-	if item.is_tool() and item.tool_area > 1:
-		return "%s (%d×%d)" % [item.display_name, item.tool_area, item.tool_area]
 	return item.display_name
 
 func _refresh_shelf_item(entry: Dictionary) -> void:
@@ -344,6 +420,8 @@ func _goods_to_sell() -> Array:
 	return result
 
 func _refresh_counter() -> void:
+	if _info_target and _info_target.get_parent() == _sell_row:
+		_hide_info(_info_target)
 	for child in _sell_row.get_children():
 		_sell_row.remove_child(child)
 		child.queue_free()
@@ -363,7 +441,11 @@ func _make_sell_slot(item: ItemData, have: int) -> Control:
 	style.set_texture_margin_all(12)
 	slot.add_theme_stylebox_override("panel", style)
 	slot.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	slot.tooltip_text = "%s · %s" % [item.display_name, money_format % item.sell_price]
+	slot.mouse_entered.connect(func():
+		var line := ItemInfo.blurb(item)
+		var each := "Sells for %s" % (money_format % item.sell_price)
+		_show_info(slot, item.display_name, each if line == "" else "%s\n%s" % [line, each]))
+	slot.mouse_exited.connect(_hide_info.bind(slot))
 	var icon := TextureRect.new()
 	icon.texture = item.icon
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -375,13 +457,13 @@ func _make_sell_slot(item: ItemData, have: int) -> Control:
 	icon.offset_bottom = -10
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	slot.add_child(icon)
-	var count := _label(str(have), 16, Color.WHITE)
+	var count := _label(str(have), 18, Color.WHITE)
 	count.anchor_left = 1.0
 	count.anchor_top = 1.0
 	count.anchor_right = 1.0
 	count.anchor_bottom = 1.0
 	count.offset_left = -50
-	count.offset_top = -26
+	count.offset_top = -28
 	count.offset_right = -7
 	count.offset_bottom = -3
 	count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT

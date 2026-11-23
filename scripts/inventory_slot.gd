@@ -1,6 +1,8 @@
 class_name InventorySlot
 extends Panel
 
+const ItemInfo := preload("res://scripts/item_info.gd")
+
 signal clicked(container_id: String, index: int)
 signal right_clicked(container_id: String, index: int)
 signal shift_clicked(container_id: String, index: int)
@@ -23,8 +25,8 @@ signal shift_clicked(container_id: String, index: int)
 @export var show_tooltip: bool = true
 @export var tooltip_sell_format: String = "Sells for €%d"
 @export var tooltip_unsellable_text: String = "Cannot be sold"
-@export var tooltip_name_font_size: int = 16
-@export var tooltip_price_font_size: int = 16
+@export var tooltip_name_font_size: int = 18
+@export var tooltip_price_font_size: int = 18
 @export var tooltip_background: Color = Color(0.18, 0.12, 0.08, 0.97)
 @export var tooltip_border: Color = Color(0.48, 0.36, 0.24, 1)
 @export var tooltip_name_color: Color = Color(1, 1, 1)
@@ -127,9 +129,10 @@ func _make_custom_tooltip(_for_text: String) -> Object:
 	name_label.add_theme_color_override("font_color", tooltip_name_color)
 	v.add_child(name_label)
 
-	if item.description != "":
+	var blurb := ItemInfo.blurb(item)
+	if blurb != "":
 		var desc_label := Label.new()
-		desc_label.text = item.description
+		desc_label.text = blurb
 		desc_label.add_theme_font_size_override("font_size", tooltip_price_font_size)
 		desc_label.add_theme_color_override("font_color", tooltip_name_color.darkened(0.15))
 		v.add_child(desc_label)

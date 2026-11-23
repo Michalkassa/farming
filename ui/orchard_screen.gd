@@ -498,8 +498,10 @@ func _open_picker(index: int) -> void:
 	panel.add_child(box)
 	var title := Label.new()
 	title.text = {&"tree": "Plant a tree", &"vine": "Plant a vine", &"bush": "Plant a bush"}[kind]
-	title.add_theme_font_size_override("font_size", 26)
+	title.add_theme_font_size_override("font_size", 27)
 	title.add_theme_color_override("font_color", gold_color)
+	title.add_theme_color_override("font_outline_color", Color8(46, 26, 18))
+	title.add_theme_constant_override("outline_size", 6)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
 	var grid := GridContainer.new()
@@ -532,12 +534,13 @@ func _sapling_card(index: int, id: StringName) -> Control:
 	card.add_child(icon)
 	var name := Label.new()
 	name.text = item.display_name
-	name.add_theme_font_size_override("font_size", 15)
+	name.add_theme_font_size_override("font_size", 18)
 	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(name)
 	var info := Label.new()
-	info.text = "%d every %ds" % [data.yield, int(data.every)]
-	info.add_theme_font_size_override("font_size", 12)
+	info.text = "×%d" % data.yield
+	info.tooltip_text = "Fruit per harvest"
+	info.add_theme_font_size_override("font_size", 18)
 	info.add_theme_color_override("font_color", Color(0.85, 0.8, 0.7))
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(info)
@@ -545,7 +548,7 @@ func _sapling_card(index: int, id: StringName) -> Control:
 	buy.text = money_format % data.sapling
 	buy.theme_type_variation = &"AccentButton"
 	buy.focus_mode = Control.FOCUS_NONE
-	buy.add_theme_font_size_override("font_size", 16)
+	buy.add_theme_font_size_override("font_size", 18)
 	buy.disabled = not GameState.can_afford(data.sapling)
 	buy.pressed.connect(func():
 		if Orchard.plant(index, id):
