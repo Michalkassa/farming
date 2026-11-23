@@ -2,7 +2,8 @@ extends CanvasLayer
 ## The orchard: a separate sunny field reached from the farm's signpost.
 ## Three rows of plots (trees at the back, vines on trellises, bushes in front)
 ## sit in a little fenced meadow under a blue sky with drifting clouds, with a
-## shed, a pond, a few flowers and butterflies.
+## shed (with a smiling girl in pink standing in front of it), a pond, a few
+## flowers and butterflies.
 ##   Empty plot: click to pick a sapling to buy and plant.
 ##   Fruiting plant (sparkling): click to pick the fruit into your bags.
 ##   Holding the shovel: click a plant to dig it up and free the plot.
@@ -36,6 +37,9 @@ var _plants: Array[TextureRect] = []
 var _sparkles: Array[Control] = []
 var _clouds: Array[Dictionary] = []
 var _butterflies: Array[Dictionary] = []
+var _girl: TextureRect
+var _girl_foot: Vector2
+var _girl_hop: Tween
 var _picker: Control
 ## The picker floats above the HUD (this screen sits below it) on its own layer.
 var _picker_layer: CanvasLayer
@@ -224,6 +228,12 @@ func _build_ground() -> void:
 
 	# The shed and wheelbarrow on the right; the pond below them.
 	_planted(_stage, "shed", Vector2(1056, 300))
+	# The orchard keeper, smiling in front of her shed. Click her for a hop and a heart.
+	_girl_foot = Vector2(1030, 322)
+	_girl = _planted(_stage, "girl_0", _girl_foot)
+	_girl.mouse_filter = Control.MOUSE_FILTER_STOP
+	_girl.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_girl.gui_input.connect(_on_girl_input)
 	_planted(_stage, "wheelbarrow", Vector2(1010, 380))
 	var pond := AtlasTexture.new()
 	pond.atlas = load("res://Clover Valley V2 Free/Tilesets/Water_free.png")
@@ -310,6 +320,10 @@ func _process(delta: float) -> void:
 	if not visible:
 		return
 	var t := Time.get_ticks_msec() / 1000.0
+	# The girl breathes gently and blinks every few seconds.
+	if not (_girl_hop and _girl_hop.is_running()):
+		_girl.scale = Vector2(1.0, 1.0 + sin(t * 2.4) * 0.015)
+	_girl.texture = _tex("girl_1" if fmod(t, 3.7) < 0.14 else "girl_0")
 	for cloud in _clouds:
 		var node: TextureRect = cloud.node
 		node.position.x += cloud.speed * delta
@@ -540,6 +554,27 @@ func _close_picker() -> void:
 		_picker = null
 
 # --- Juice --------------------------------------------------------------------
+
+func _on_girl_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+		return
+	_girl.accept_event()
+	if _girl_hop and _girl_hop.is_running():
+		return
+	var rest_y := _girl_foot.y - _girl.size.y
+	_girl.scale = Vector2.ONE
+	_girl_hop = create_tween()
+	_girl_hop.tween_property(_girl, "position:y", rest_y - 24, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_girl_hop.tween_property(_girl, "position:y", rest_y, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	var heart := _sprite(_stage, "heart", _girl.position + Vector2(_girl.size.x * 0.5 - 13, -30), 3.0)
+	heart.pivot_offset = heart.size * 0.5
+	heart.scale = Vector2(0.3, 0.3)
+	var float_up := heart.create_tween().set_parallel(true)
+	float_up.tween_property(heart, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	float_up.tween_property(heart, "position:y", heart.position.y - 50, 1.0)
+	float_up.tween_property(heart, "modulate:a", 0.0, 0.5).set_delay(0.5)
+	float_up.chain().tween_callback(heart.queue_free)
+
 
 func _pop(target: Control) -> void:
 	var tween := create_tween()

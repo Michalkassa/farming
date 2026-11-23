@@ -615,6 +615,80 @@ def shovel():
     return p.outline()
 
 
+# The orchard keeper: a smiling blonde girl in a pink dress with a bow.
+GIRL_PAL = {
+    "o": (92, 46, 62),      # outline
+    "H": (250, 212, 100),   # hair
+    "h": (255, 240, 165),   # hair shine
+    "d": (214, 160, 58),    # hair shade
+    "B": (255, 112, 168),   # bow
+    "b": (214, 66, 128),    # bow shade
+    "S": (255, 220, 190),   # skin
+    "C": (255, 152, 168),   # rosy cheeks
+    "E": (66, 40, 70),      # eyes
+    "e": (255, 255, 255),   # eye sparkle
+    "M": (210, 82, 108),    # smile
+    "P": (255, 150, 200),   # dress
+    "p": (228, 102, 162),   # dress shade
+    "L": (255, 200, 228),   # dress light
+    "W": (255, 255, 255),   # collar
+    "K": (222, 92, 148),    # shoes
+}
+GIRL = [
+    "......oooo..oo..",
+    "....ooHHHHooBBo.",
+    "...oHHhhhHHoBbBo",
+    "..oHHhhHHHHHoBBo",
+    "..oHhHHHHHHHHoo.",
+    ".oHHHdddddddHHo.",
+    ".oHHdSSSSSSSdHHo",
+    ".oHdSSSSSSSSSdHo",
+    ".oHdSEESSSEESdHo",
+    ".oHdSEeSSSEeSdHo",
+    ".oHdCSMSSSMSCdHo",
+    ".oHHdSSMMMSSdHHo",
+    ".oHHHdSSSSSdHHHo",
+    "..oHHHoWWWoHHHo.",
+    "..oHHoPWLWPoHHo.",
+    "...ooPPLLLPPoo..",
+    "...oSPPPPPPPSo..",
+    "...oSPPPPPPPSo..",
+    "....oPPPPPPPo...",
+    "...oPPLPPPLPPo..",
+    "..oPPPPPPPPPPPo.",
+    "..opPpPpPpPpPpo.",
+    "...ooooooooooo..",
+    ".....oSo.oSo....",
+    ".....oSo.oSo....",
+    "....oKKo.oKKo...",
+    "....oooo.oooo...",
+]
+
+
+def girl(blink):
+    rows = list(GIRL)
+    if blink:   # eyes shut in happy little arcs
+        rows[8] = ".oHdSSSSSSSSSdHo"
+        rows[9] = ".oHdSEESSSEESdHo"
+    p = Px(16, len(rows))
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row[:16]):
+            if ch != ".":
+                p.put(x, y, GIRL_PAL[ch])
+    return p
+
+
+def heart():
+    p = Px(9, 8)
+    rows = [".oo...oo.", "oHHo.oHHo", "oHhHoHHHo", "oHHHHHHHo", ".oHHHHHo.", "..oHHHo..", "...oHo...", "....o...."]
+    pal = {"o": (150, 30, 70), "H": (255, 90, 140), "h": (255, 200, 220)}
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                p.put(x, y, pal[ch])
+    return p
+
+
 def decor():
     cloud(0).save(OUT / "cloud_0.png")
     cloud(1).save(OUT / "cloud_1.png")
@@ -632,6 +706,9 @@ def decor():
     signpost().save(OUT / "signpost.png")
     wheelbarrow().save(OUT / "wheelbarrow.png")
     sparkle().save(OUT / "sparkle.png")
+    girl(False).save(OUT / "girl_0.png")
+    girl(True).save(OUT / "girl_1.png")
+    heart().save(OUT / "heart.png")
 
 
 def main():
